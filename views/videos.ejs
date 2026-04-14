@@ -1,0 +1,27 @@
+<%- include('partials/header', { title: 'Videolar' }) %>
+
+<section class="section">
+  <div class="container">
+    <h1 class="page-title">🎬 Videolar</h1>
+    <div class="media-grid">
+      <% mediaList.forEach(item => { %>
+      <a href="/medya/<%= item.id %>" class="media-card">
+        <div class="media-thumb">
+          <div class="video-thumb">
+            <video src="/uploads/<%= item.filename %>" preload="metadata"></video>
+            <span class="play-icon">▶</span>
+          </div>
+        </div>
+        <div class="media-info">
+          <h3><%= item.title %></h3>
+          <% if (item.category_name) { %><span class="tag"><%= item.category_name %></span><% } %>
+          <div class="meta"><span>👁 <%= item.views %></span><span>⬇ <%= item.downloads %></span></div>
+        </div>
+      </a>
+      <% }) %>
+    </div>
+    <% if (mediaList.length === 0) { %><p class="empty">Henüz video yüklenmedi.</p><% } %>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

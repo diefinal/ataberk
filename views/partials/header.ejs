@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title + ' | ' : '' %>Ataberktaşçı</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar">
+  <div class="container">
+    <a href="/" class="logo">Ataberktaşçı</a>
+    <div class="nav-links">
+      <a href="/">Ana Sayfa</a>
+      <a href="/fotograflar">Fotoğraflar</a>
+      <a href="/videolar">Videolar</a>
+      <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
+      <div class="dropdown">
+        <span>Kategoriler</span>
+        <div class="dropdown-menu">
+          <% categories.forEach(cat => { %>
+          <a href="/kategori/<%= cat.slug %>"><%= cat.name %></a>
+          <% }) %>
+        </div>
+      </div>
+      <% } %>
+      <% if (typeof session !== 'undefined' && session.user) { %>
+      <a href="/admin" class="btn-admin">Admin</a>
+      <% } %>
+    </div>
+  </div>
+</nav>

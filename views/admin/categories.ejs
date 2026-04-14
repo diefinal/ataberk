@@ -1,0 +1,44 @@
+<%- include('../partials/header', { title: 'Kategoriler' }) %>
+
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <h2>Admin Panel</h2>
+    <nav>
+      <a href="/admin">📊 Dashboard</a>
+      <a href="/admin/yukle">⬆ Yükle</a>
+      <a href="/admin/kategoriler" class="active">📁 Kategoriler</a>
+      <a href="/admin/yorumlar">💬 Yorumlar</a>
+      <a href="/admin/cikis">🚪 Çıkış</a>
+    </nav>
+  </aside>
+
+  <main class="admin-main">
+    <h1>Kategoriler</h1>
+
+    <form method="POST" action="/admin/kategoriler/ekle" class="inline-form">
+      <input type="text" name="name" placeholder="Kategori adı" required>
+      <input type="text" name="description" placeholder="Açıklama (opsiyonel)">
+      <button type="submit" class="btn-primary">+ Ekle</button>
+    </form>
+
+    <table class="admin-table">
+      <thead><tr><th>Kategori</th><th>Açıklama</th><th>İçerik</th><th>İşlem</th></tr></thead>
+      <tbody>
+        <% categories.forEach(cat => { %>
+        <tr>
+          <td><a href="/kategori/<%= cat.slug %>"><%= cat.name %></a></td>
+          <td><%= cat.description || '-' %></td>
+          <td><%= cat.media_count %></td>
+          <td>
+            <form method="POST" action="/admin/kategoriler/sil/<%= cat.id %>" onsubmit="return confirm('Silmek istediğinize emin misiniz?')">
+              <button type="submit" class="btn-danger">Sil</button>
+            </form>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </main>
+</div>
+
+<%- include('../partials/footer') %>

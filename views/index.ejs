@@ -1,0 +1,44 @@
+<%- include('partials/header', { title: 'Ana Sayfa' }) %>
+
+<section class="hero">
+  <div class="container">
+    <h1>Hoş Geldiniz</h1>
+    <p>Fotoğraf ve video koleksiyonum</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">Son Yüklenenler</h2>
+    <div class="media-grid">
+      <% recentMedia.forEach(item => { %>
+      <a href="/medya/<%= item.id %>" class="media-card">
+        <div class="media-thumb">
+          <% if (item.type === 'image') { %>
+          <img src="/uploads/<%= item.filename %>" alt="<%= item.title %>" loading="lazy">
+          <% } else { %>
+          <div class="video-thumb">
+            <video src="/uploads/<%= item.filename %>" preload="metadata"></video>
+            <span class="play-icon">▶</span>
+          </div>
+          <% } %>
+          <span class="media-type <%= item.type %>"><%= item.type === 'image' ? '📷' : '🎬' %></span>
+        </div>
+        <div class="media-info">
+          <h3><%= item.title %></h3>
+          <% if (item.category_name) { %><span class="tag"><%= item.category_name %></span><% } %>
+          <div class="meta">
+            <span>👁 <%= item.views %></span>
+            <span>⬇ <%= item.downloads %></span>
+          </div>
+        </div>
+      </a>
+      <% }) %>
+    </div>
+    <% if (recentMedia.length === 0) { %>
+    <p class="empty">Henüz içerik yüklenmedi.</p>
+    <% } %>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

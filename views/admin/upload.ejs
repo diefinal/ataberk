@@ -1,0 +1,113 @@
+<%- include('../partials/header', { title: 'Medya Yükle' }) %>
+
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <h2>Admin Panel</h2>
+    <nav>
+      <a href="/admin">📊 Dashboard</a>
+      <a href="/admin/yukle" class="active">⬆ Yükle</a>
+      <a href="/admin/kategoriler">📁 Kategoriler</a>
+      <a href="/admin/yorumlar">💬 Yorumlar</a>
+      <a href="/admin/cikis">🚪 Çıkış</a>
+    </nav>
+  </aside>
+
+  <main class="admin-main">
+    <h1>Medya Yükle</h1>
+    <% if (error) { %><div class="alert error"><%= error %></div><% } %>
+
+    <form method="POST" action="/admin/yukle" enctype="multipart/form-data" class="upload-form">
+      <div class="form-group">
+        <label>Dosya Seç (Fotoğraf veya Video)</label>
+        <div class="file-drop" id="fileDrop">
+          <input type="file" name="file" id="fileInput" accept="image/*,video/*" required>
+          <div class="drop-text">
+            <span>📁 Dosyayı buraya sürükle veya tıkla</span>
+            <small>Fotoğraf: JPG, PNG, GIF, WebP | Video: MP4, MOV, AVI, MKV (max 500MB)</small>
+          </div>
+          <div id="filePreview" class="file-preview hidden"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Başlık</label>
+        <input type="text" name="title" required placeholder="İçerik başlığı">
+      </div>
+
+      <div class="form-group">
+        <label>Açıklama (opsiyonel)</label>
+        <textarea name="description" rows="3" placeholder="Kısa açıklama..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Kategori</label>
+        <select name="category_id">
+          <option value="">Kategori Seç</option>
+          <% categories.forEach(cat => { %>
+          <option value="<%= cat.id %>"><%= cat.name %></option>
+          <% }) %>
+        </select>
+      </div>
+
+      <div class="progress-bar hidden" id="progressBar">
+        <div class="progress-fill" id="progressFill"></div>
+        <span id="progressText">0%</span>
+      </div>
+
+      <button type="submit" class="btn-primary btn-large">⬆ Yükle</button>
+    </form>
+  </main>
+</div>
+
+<script>
+const fileInput = document.getElementById('fileInput');
+const preview = document.getElementById('filePreview');
+const dropText = document.querySelector('.drop-text');
+
+fileInput.addEventListener('change', () => {
+  const file = fileInput.files[0];
+  if (!file) return;
+  preview.innerHTML = '';
+  preview.classList.remove('hidden');
+  dropText.classList.add('hidden');
+
+  if (file.type.startsWith('image/')) {
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    preview.appendChild(img);
+  } else {
+    const vid = document.createElement('video');
+    vid.src = URL.createObjectURL(file);
+    vid.controls = true;
+    preview.appendChild(vid);
+  }
+  const info = document.createElement('p');
+  info.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(1)} MB)`;
+  preview.appendChild(info);
+});
+
+// Upload progress
+document.querySelector('.upload-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const form = this;
+  const formData = new FormData(form);
+  const xhr = new XMLHttpRequest();
+  const bar = document.getElementById('progressBar');
+  const fill = document.getElementById('progressFill');
+  const text = document.getElementById('progressText');
+
+  bar.classList.remove('hidden');
+  xhr.upload.addEventListener('progress', (e) => {
+    if (e.lengthComputable) {
+      const pct = Math.round((e.loaded / e.total) * 100);
+      fill.style.width = pct + '%';
+      text.textContent = pct + '%';
+    }
+  });
+  xhr.addEventListener('load', () => { window.location.href = '/admin'; });
+  xhr.open('POST', '/admin/yukle');
+  xhr.send(formData);
+});
+</script>
+
+<%- include('../partials/footer') %>

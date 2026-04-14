@@ -1,0 +1,64 @@
+<%- include('../partials/header', { title: 'Admin Panel' }) %>
+
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <h2>Admin Panel</h2>
+    <nav>
+      <a href="/admin">📊 Dashboard</a>
+      <a href="/admin/yukle">⬆ Yükle</a>
+      <a href="/admin/kategoriler">📁 Kategoriler</a>
+      <a href="/admin/yorumlar">💬 Yorumlar</a>
+      <a href="/admin/cikis">🚪 Çıkış</a>
+    </nav>
+  </aside>
+
+  <main class="admin-main">
+    <h1>Dashboard</h1>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-icon">📷</span>
+        <div><strong><%= stats.images %></strong><span>Fotoğraf</span></div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">🎬</span>
+        <div><strong><%= stats.videos %></strong><span>Video</span></div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">💬</span>
+        <div><strong><%= stats.comments %></strong><span>Yorum</span></div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">📁</span>
+        <div><strong><%= stats.categories %></strong><span>Kategori</span></div>
+      </div>
+    </div>
+
+    <div class="admin-section">
+      <div class="section-header">
+        <h2>Son Yüklenenler</h2>
+        <a href="/admin/yukle" class="btn-primary">+ Yeni Yükle</a>
+      </div>
+      <table class="admin-table">
+        <thead><tr><th>Başlık</th><th>Tür</th><th>Görüntülenme</th><th>İndirme</th><th>Tarih</th><th>İşlem</th></tr></thead>
+        <tbody>
+          <% recentMedia.forEach(item => { %>
+          <tr>
+            <td><a href="/medya/<%= item.id %>"><%= item.title %></a></td>
+            <td><span class="badge <%= item.type %>"><%= item.type === 'image' ? '📷 Fotoğraf' : '🎬 Video' %></span></td>
+            <td><%= item.views %></td>
+            <td><%= item.downloads %></td>
+            <td><%= new Date(item.created_at).toLocaleDateString('tr-TR') %></td>
+            <td>
+              <form method="POST" action="/admin/sil/<%= item.id %>" onsubmit="return confirm('Silmek istediğinize emin misiniz?')">
+                <button type="submit" class="btn-danger">Sil</button>
+              </form>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<%- include('../partials/footer') %>

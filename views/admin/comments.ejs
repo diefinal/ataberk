@@ -1,0 +1,41 @@
+<%- include('../partials/header', { title: 'Yorumlar' }) %>
+
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <h2>Admin Panel</h2>
+    <nav>
+      <a href="/admin">📊 Dashboard</a>
+      <a href="/admin/yukle">⬆ Yükle</a>
+      <a href="/admin/kategoriler">📁 Kategoriler</a>
+      <a href="/admin/yorumlar" class="active">💬 Yorumlar</a>
+      <a href="/admin/cikis">🚪 Çıkış</a>
+    </nav>
+  </aside>
+
+  <main class="admin-main">
+    <h1>Yorumlar</h1>
+    <table class="admin-table">
+      <thead><tr><th>Yazar</th><th>Yorum</th><th>İçerik</th><th>Tarih</th><th>İşlem</th></tr></thead>
+      <tbody>
+        <% comments.forEach(c => { %>
+        <tr>
+          <td><strong><%= c.author %></strong></td>
+          <td><%= c.content %></td>
+          <td><a href="/medya/<%= c.media_id %>"><%= c.media_title %></a></td>
+          <td><%= new Date(c.created_at).toLocaleDateString('tr-TR') %></td>
+          <td>
+            <form method="POST" action="/admin/yorumlar/sil/<%= c.id %>">
+              <button type="submit" class="btn-danger">Sil</button>
+            </form>
+          </td>
+        </tr>
+        <% }) %>
+        <% if (comments.length === 0) { %>
+        <tr><td colspan="5" class="empty">Henüz yorum yok.</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </main>
+</div>
+
+<%- include('../partials/footer') %>

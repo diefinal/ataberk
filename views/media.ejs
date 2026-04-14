@@ -1,0 +1,108 @@
+<%- include('partials/header', { title: media.title }) %>
+
+<div class="container media-detail">
+  <div class="breadcrumb">
+    <a href="/">Ana Sayfa</a> /
+    <% if (media.category_slug) { %><a href="/kategori/<%= media.category_slug %>"><%= media.category_name %></a> /<% } %>
+    <span><%= media.title %></span>
+  </div>
+
+  <div class="media-viewer">
+    <% if (media.type === 'image') { %>
+    <img src="/uploads/<%= media.filename %>" alt="<%= media.title %>" class="full-image">
+    <% } else { %>
+    <video controls class="full-video" preload="metadata">
+      <source src="/uploads/<%= media.filename %>">
+      Tarayıcınız video oynatmayı desteklemiyor.
+    </video>
+    <% } %>
+  </div>
+
+  <div class="media-meta-bar">
+    <div>
+      <h1><%= media.title %></h1>
+      <% if (media.description) { %><p class="desc"><%= media.description %></p><% } %>
+      <div class="meta-stats">
+        <span>👁 <%= media.views %> görüntülenme</span>
+        <span>⬇ <%= media.downloads %> indirme</span>
+        <span>📅 <%= new Date(media.created_at).toLocaleDateString('tr-TR') %></span>
+        <% if (media.category_name) { %><span class="tag"><%= media.category_name %></span><% } %>
+      </div>
+    </div>
+    <a href="/api/indir/<%= media.id %>" class="btn-download">⬇ İndir</a>
+  </div>
+
+  <!-- Yorumlar -->
+  <div class="comments-section">
+    <h2>Yorumlar (<%= comments.length %>)</h2>
+
+    <form class="comment-form" id="commentForm">
+      <input type="text" name="author" placeholder="Adınız" required maxlength="50">
+      <textarea name="content" placeholder="Yorumunuzu yazın..." required maxlength="500" rows="3"></textarea>
+      <button type="submit">Yorum Yap</button>
+    </form>
+
+    <div class="comments-list" id="commentsList">
+      <% comments.forEach(c => { %>
+      <div class="comment">
+        <div class="comment-header">
+          <strong><%= c.author %></strong>
+          <span><%= new Date(c.created_at).toLocaleDateString('tr-TR') %></span>
+        </div>
+        <p><%= c.content %></p>
+      </div>
+      <% }) %>
+      <% if (comments.length === 0) { %>
+      <p class="empty">Henüz yorum yok. İlk yorumu sen yap!</p>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- İlgili içerikler -->
+  <% if (related.length > 0) { %>
+  <div class="related-section">
+    <h2>İlgili İçerikler</h2>
+    <div class="media-grid">
+      <% related.forEach(item => { %>
+      <a href="/medya/<%= item.id %>" class="media-card">
+        <div class="media-thumb">
+          <% if (item.type === 'image') { %>
+          <img src="/uploads/<%= item.filename %>" alt="<%= item.title %>" loading="lazy">
+          <% } else { %>
+          <div class="video-thumb">
+            <video src="/uploads/<%= item.filename %>" preload="metadata"></video>
+            <span class="play-icon">▶</span>
+          </div>
+          <% } %>
+        </div>
+        <div class="media-info"><h3><%= item.title %></h3></div>
+      </a>
+      <% }) %>
+    </div>
+  </div>
+  <% } %>
+</div>
+
+<script>
+document.getElementById('commentForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const data = { author: form.author.value, content: form.content.value };
+  const res = await fetch('/api/yorum/<%= media.id %>', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (res.ok) {
+    const div = document.createElement('div');
+    div.className = 'comment new';
+    div.innerHTML = `<div class="comment-header"><strong>${data.author}</strong><span>Az önce</span></div><p>${data.content}</p>`;
+    const list = document.getElementById('commentsList');
+    const empty = list.querySelector('.empty');
+    if (empty) empty.remove();
+    list.prepend(div);
+    form.reset();
+  }
+});
+</script>
+
+<%- include('partials/footer') %>

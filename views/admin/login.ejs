@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Giriş</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="login-page">
+  <div class="login-box">
+    <h1>🔐 Admin Girişi</h1>
+    <% if (error) { %><div class="alert error"><%= error %></div><% } %>
+    <form method="POST" action="/admin/giris">
+      <input type="text" name="username" placeholder="Kullanıcı Adı" required autofocus>
+      <input type="password" name="password" placeholder="Şifre" required>
+      <button type="submit">Giriş Yap</button>
+    </form>
+    <a href="/" class="back-link">← Siteye Dön</a>
+  </div>
+</body>
+</html>

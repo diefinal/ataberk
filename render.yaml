@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: ataberktasci-media
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    disk:
+      name: uploads
+      mountPath: /opt/render/project/src/uploads
+      sizeGB: 10
+    envVars:
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: ADMIN_PASSWORD
+        value: admin123
