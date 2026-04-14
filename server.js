@@ -31,7 +31,7 @@ app.use(session({
 
 // Auth middleware
 const requireAuth = (req, res, next) => {
-  if (req.session.user) return next();
+  if (req.session.user) return next(); // admin her zaman geçer
   if (req.session.verified) return next();
   res.redirect('/giris');
 };
@@ -40,7 +40,6 @@ const requireAuth = (req, res, next) => {
 const authRouter = require('./routes/auth');
 app.use('/giris', authRouter);
 
-// POST /dogrula - kod doğrula
 app.post('/dogrula', (req, res) => {
   const { code } = req.body;
   const email = req.session.pendingEmail;
@@ -66,8 +65,8 @@ app.get('/cikis-yap', (req, res) => {
   res.redirect('/giris');
 });
 
+app.use('/admin', require('./routes/admin')); // auth middleware'den önce
 app.use('/', requireAuth, require('./routes/public'));
-app.use('/admin', require('./routes/admin'));
 app.use('/api', requireAuth, require('./routes/api'));
 
 // DB başlat, sonra sunucuyu aç

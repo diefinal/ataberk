@@ -2,27 +2,16 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
 const { prepare } = require('../db');
+const { uploadFile, deleteFile } = require('../cloudinary');
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const dir = file.mimetype.startsWith('video/') ? 'uploads/videos' : 'uploads/images';
-    cb(null, dir);
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, Date.now() + '-' + Math.round(Math.random() * 1e9) + ext);
-  }
-});
-
+// Multer - memory storage (Cloudinary'e göndereceğiz)
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 500 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowed = /jpeg|jpg|png|gif|webp|mp4|mov|avi|mkv|webm/;
-    const ext = allowed.test(path.extname(file.originalname).toLowerCase());
+    const ext = allowed.test(file.originalname.toLowerCase().split('.').pop());
     if (ext) cb(null, true);
     else cb(new Error('Desteklenmeyen dosya formatı'));
   }
@@ -69,26 +58,41 @@ router.get('/yukle', isAdmin, (req, res) => {
   res.render('admin/upload', { categories, session: req.session, error: null });
 });
 
-router.post('/yukle', isAdmin, upload.single('file'), (req, res) => {
+router.post('/yukle', isAdmin, upload.single('file'), async (req, res) => {
   if (!req.file) {
     const categories = prepare('SELECT * FROM categories ORDER BY name').all();
     return res.render('admin/upload', { categories, session: req.session, error: 'Dosya seçilmedi' });
   }
-  const { title, description, category_id } = req.body;
-  const type = req.file.mimetype.startsWith('video/') ? 'video' : 'image';
-  const filename = (type === 'video' ? 'videos/' : 'images/') + req.file.filename;
+  try {
+    const { title, description, category_id } = req.body;
+    const type = req.file.mimetype.startsWith('video/') ? 'video' : 'image';
 
-  prepare('INSERT INTO media (title, description, type, filename, category_id) VALUES (?, ?, ?, ?, ?)').run(
-    [title, description, type, filename, category_id || null]
-  );
-  res.redirect('/admin');
+    const result = await uploadFile(req.file.buffer, req.file.mimetype, req.file.originalname);
+
+    prepare('INSERT INTO media (title, description, type, filename, category_id) VALUES (?, ?, ?, ?, ?)').run(
+      [title, description, type, result.url, category_id || null]
+    );
+    res.redirect('/admin');
+  } catch (e) {
+    console.error('Upload hatası:', e.message);
+    const categories = prepare('SELECT * FROM categories ORDER BY name').all();
+    res.render('admin/upload', { categories, session: req.session, error: 'Yükleme başarısız: ' + e.message });
+  }
 });
 
-router.post('/sil/:id', isAdmin, (req, res) => {
+router.post('/sil/:id', isAdmin, async (req, res) => {
   const media = prepare('SELECT * FROM media WHERE id = ?').get(req.params.id);
   if (media) {
-    const filePath = path.join(__dirname, '../uploads', media.filename);
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    // Cloudinary'den sil (URL'den public_id çıkar)
+    try {
+      const url = media.filename;
+      const parts = url.split('/');
+      const fileWithExt = parts[parts.length - 1];
+      const file = fileWithExt.split('.')[0];
+      const folder = parts[parts.length - 2];
+      const public_id = folder + '/' + file;
+      await deleteFile(public_id, media.type === 'video' ? 'video' : 'image');
+    } catch (e) {}
     prepare('DELETE FROM media WHERE id = ?').run(media.id);
   }
   res.redirect('/admin');
