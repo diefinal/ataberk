@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Giriş — Ataberktaşçı</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body class="login-page">
+  <div class="login-box">
+    <h1>Ataberk<span style="color:#c8102e;">.</span>Taşçı</h1>
+
+    <% if (step === 'email') { %>
+      <p style="color:#888;font-size:0.88rem;text-align:center;margin-bottom:24px;">Siteye erişmek için e-posta adresinizi girin. Doğrulama kodu göndereceğiz.</p>
+      <% if (error) { %><div class="alert error"><%= error %></div><% } %>
+      <form method="POST" action="/giris">
+        <input type="email" name="email" placeholder="E-posta adresiniz" required autofocus>
+        <button type="submit">Kod Gönder →</button>
+      </form>
+
+    <% } else { %>
+      <p style="color:#888;font-size:0.88rem;text-align:center;margin-bottom:24px;">E-postanıza 6 haneli doğrulama kodu gönderdik.</p>
+      <% if (error) { %><div class="alert error"><%= error %></div><% } %>
+      <form method="POST" action="/dogrula">
+        <input type="text" name="code" placeholder="6 haneli kod" maxlength="6" required autofocus
+               style="letter-spacing:8px;font-size:1.4rem;text-align:center;font-weight:700;">
+        <button type="submit">Giriş Yap →</button>
+      </form>
+      <a href="/giris" class="back-link">← Farklı e-posta kullan</a>
+    <% } %>
+  </div>
+</body>
+</html>
