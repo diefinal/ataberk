@@ -477,3 +477,23 @@ img, video { max-width: 100%; display: block; }
 .lb-prev { left: 20px; }
 .lb-next { right: 20px; }
 .lb-prev:hover, .lb-next:hover { background: var(--accent); border-color: var(--accent); }
+
+/* ── REAKSİYONLAR ── */
+.reactions-bar {
+  display: flex; align-items: center; gap: 16px;
+  background: var(--bg2); border: 1px solid var(--border);
+  padding: 16px 20px; margin-bottom: 40px; flex-wrap: wrap;
+}
+.reactions-label { font-size: 0.85rem; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
+.reaction-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.reaction-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg3); border: 2px solid transparent;
+  padding: 8px 16px; border-radius: 999px; cursor: pointer;
+  font-size: 0.9rem; font-weight: 600; transition: all 0.2s;
+  color: var(--text);
+}
+.reaction-btn:hover { border-color: var(--border); transform: scale(1.05); }
+.reaction-btn.active { border-color: var(--accent); background: rgba(200,16,46,0.08); }
+.reaction-btn .emoji { font-size: 1.2rem; line-height: 1; }
+.reaction-btn .count { color: var(--text2); font-size: 0.82rem; min-width: 12px; }
