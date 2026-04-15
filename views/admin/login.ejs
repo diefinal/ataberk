@@ -3,20 +3,145 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Giriş</title>
-  <link rel="stylesheet" href="/css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <title>Admin Giriş — Ataberktaşçı</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(180deg, #0a1628 0%, #1a3a5c 50%, #2d6a9f 100%);
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; position: relative;
+    }
+    .ground {
+      position: fixed; bottom: 0; left: 0; right: 0; height: 80px;
+      background: linear-gradient(180deg, #c8e6f5 0%, #e8f4fd 100%);
+      border-radius: 50% 50% 0 0 / 20px 20px 0 0; z-index: 1;
+    }
+    .ground::before {
+      content: ''; position: absolute; top: -15px; left: -5%; right: -5%;
+      height: 30px; background: #e8f4fd; border-radius: 50%;
+    }
+    .character-wrap {
+      position: fixed; bottom: 55px; left: 40px;
+      z-index: 10; cursor: pointer;
+      animation: float 3s ease-in-out infinite;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(-1deg); }
+      50% { transform: translateY(-10px) rotate(1deg); }
+    }
+    .character-wrap:hover { animation: wiggle 0.5s ease; }
+    @keyframes wiggle {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(-8deg) scale(1.05); }
+      75% { transform: rotate(8deg) scale(1.05); }
+      100% { transform: rotate(0deg) scale(1); }
+    }
+    .character-wrap img { width: 160px; height: auto; display: block; mix-blend-mode: multiply; }
+    .login-box {
+      background: rgba(255,255,255,0.08); backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.15); border-top: 3px solid #c8102e;
+      padding: 48px 40px; width: 100%; max-width: 380px;
+      position: relative; z-index: 10; border-radius: 4px;
+    }
+    .login-box h1 {
+      font-size: 1.4rem; font-weight: 900; margin-bottom: 4px;
+      text-align: center; color: #fff; text-transform: uppercase;
+    }
+    .login-box h1 span { color: #c8102e; }
+    .admin-badge {
+      display: block; text-align: center; color: rgba(255,255,255,0.4);
+      font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 28px;
+    }
+    .login-box form { display: flex; flex-direction: column; gap: 12px; }
+    .login-box input {
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+      color: #fff; padding: 13px 16px; font-family: inherit; font-size: 0.95rem;
+      transition: border-color 0.2s; border-radius: 4px;
+    }
+    .login-box input::placeholder { color: rgba(255,255,255,0.4); }
+    .login-box input:focus { outline: none; border-color: #c8102e; background: rgba(255,255,255,0.15); }
+    .login-box button {
+      background: #c8102e; color: #fff; border: none; padding: 13px;
+      font-size: 0.85rem; font-weight: 700; cursor: pointer;
+      text-transform: uppercase; letter-spacing: 1px;
+      transition: background 0.2s; border-radius: 4px; margin-top: 4px;
+    }
+    .login-box button:hover { background: #a00d24; }
+    .back-link {
+      display: block; text-align: center; margin-top: 16px;
+      color: rgba(255,255,255,0.4); font-size: 0.85rem; text-decoration: none;
+    }
+    .back-link:hover { color: #fff; }
+    .alert {
+      padding: 10px 14px; margin-bottom: 14px; font-size: 0.85rem; font-weight: 500;
+      border-radius: 4px; background: rgba(200,16,46,0.2);
+      border-left: 3px solid #c8102e; color: #ffaaaa;
+    }
+    @keyframes popUp {
+      0% { opacity:0; transform: translateY(10px) scale(0.8); }
+      20% { opacity:1; transform: translateY(0) scale(1); }
+      80% { opacity:1; }
+      100% { opacity:0; transform: translateY(-10px); }
+    }
+  </style>
 </head>
-<body class="login-page">
+<body>
+  <canvas id="snowCanvas" style="position:fixed;inset:0;z-index:0;pointer-events:none;"></canvas>
+  <div class="ground"></div>
+
+  <div class="character-wrap" title="Admin girişi 🔐">
+    <img src="/images/karakter.png" alt="Penguen karakter">
+  </div>
+
   <div class="login-box">
-    <h1>🔐 Admin Girişi</h1>
-    <% if (error) { %><div class="alert error"><%= error %></div><% } %>
+    <h1>Ataberk<span>.</span>Taşçı</h1>
+    <span class="admin-badge">🔐 Admin Paneli</span>
+    <% if (error) { %><div class="alert"><%= error %></div><% } %>
     <form method="POST" action="/admin/giris">
       <input type="text" name="username" placeholder="Kullanıcı Adı" required autofocus>
       <input type="password" name="password" placeholder="Şifre" required>
-      <button type="submit">Giriş Yap</button>
+      <button type="submit">Giriş Yap →</button>
     </form>
     <a href="/" class="back-link">← Siteye Dön</a>
   </div>
+
+  <script>
+    const canvas = document.getElementById('snowCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+    const flakes = Array.from({ length: 120 }, () => ({
+      x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+      r: Math.random() * 3 + 1, speed: Math.random() * 1.5 + 0.5,
+      wind: Math.random() * 0.5 - 0.25, opacity: Math.random() * 0.6 + 0.3,
+    }));
+    function drawSnow() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      flakes.forEach(f => {
+        ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${f.opacity})`; ctx.fill();
+        f.y += f.speed; f.x += f.wind;
+        if (f.y > canvas.height) { f.y = -5; f.x = Math.random() * canvas.width; }
+        if (f.x > canvas.width) f.x = 0; if (f.x < 0) f.x = canvas.width;
+      });
+      requestAnimationFrame(drawSnow);
+    }
+    drawSnow();
+
+    const char = document.querySelector('.character-wrap');
+    const msgs = ['Hoş geldin! 👋', 'Şifreni gir! 🔐', 'Kar güzel değil mi? ❄️', 'Admin sensin! 👑', 'Brrr, soğuk! 🥶'];
+    let i = 0;
+    char.addEventListener('click', () => {
+      const b = document.createElement('div');
+      b.textContent = msgs[i++ % msgs.length];
+      b.style.cssText = `position:fixed;bottom:230px;left:30px;background:#fff;color:#333;padding:8px 14px;border-radius:20px;font-size:0.9rem;font-weight:700;white-space:nowrap;z-index:20;pointer-events:none;animation:popUp 2s ease forwards;box-shadow:0 4px 12px rgba(0,0,0,0.2);`;
+      document.body.appendChild(b);
+      setTimeout(() => b.remove(), 2000);
+    });
+  </script>
 </body>
 </html>

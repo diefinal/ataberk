@@ -9,7 +9,7 @@
 
   <div class="media-viewer">
     <% if (media.type === 'image') { %>
-    <img src="/uploads/<%= media.filename %>" alt="<%= media.title %>" class="full-image">
+    <img src="<%= media.filename %>" alt="<%= media.title %>" class="full-image lb-trigger" data-src="<%= media.filename %>" data-caption="<%= media.title %>">
     <% } else { %>
     <video controls class="full-video" preload="metadata">
       <source src="/uploads/<%= media.filename %>">

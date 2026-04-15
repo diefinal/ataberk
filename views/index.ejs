@@ -39,7 +39,7 @@
       <a href="/medya/<%= item.id %>" class="media-card">
         <div class="media-thumb">
           <% if (item.type === 'image') { %>
-          <img src="/uploads/<%= item.filename %>" alt="<%= item.title %>" loading="lazy">
+          <img src="<%= item.filename %>" alt="<%= item.title %>" loading="lazy" class="lb-trigger" data-src="<%= item.filename %>" data-caption="<%= item.title %>">
           <% } else { %>
           <div class="video-thumb">
             <video src="/uploads/<%= item.filename %>" preload="metadata"></video>
