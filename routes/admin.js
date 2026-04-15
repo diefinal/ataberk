@@ -58,26 +58,44 @@ router.get('/yukle', isAdmin, (req, res) => {
   res.render('admin/upload', { categories, session: req.session, error: null });
 });
 
-router.post('/yukle', isAdmin, upload.single('file'), async (req, res) => {
-  if (!req.file) {
+router.post('/yukle', isAdmin, upload.array('file', 50), async (req, res) => {
+  if (!req.files || req.files.length === 0) {
     const categories = prepare('SELECT * FROM categories ORDER BY name').all();
     return res.render('admin/upload', { categories, session: req.session, error: 'Dosya seçilmedi' });
   }
   try {
     const { title, description, category_id } = req.body;
-    const type = req.file.mimetype.startsWith('video/') ? 'video' : 'image';
-
-    const result = await uploadFile(req.file.buffer, req.file.mimetype, req.file.originalname);
-
-    prepare('INSERT INTO media (title, description, type, filename, category_id) VALUES (?, ?, ?, ?, ?)').run(
-      [title, description, type, result.url, category_id || null]
-    );
+    for (let i = 0; i < req.files.length; i++) {
+      const file = req.files[i];
+      const type = file.mimetype.startsWith('video/') ? 'video' : 'image';
+      const result = await uploadFile(file.buffer, file.mimetype, file.originalname);
+      const fileTitle = req.files.length === 1 ? title : `${title} ${i + 1}`;
+      prepare('INSERT INTO media (title, description, type, filename, category_id) VALUES (?, ?, ?, ?, ?)').run(
+        [fileTitle, description, type, result.url, category_id || null]
+      );
+    }
     res.redirect('/admin');
   } catch (e) {
     console.error('Upload hatası:', e.message);
     const categories = prepare('SELECT * FROM categories ORDER BY name').all();
     res.render('admin/upload', { categories, session: req.session, error: 'Yükleme başarısız: ' + e.message });
   }
+});
+
+// İçerik düzenle
+router.get('/duzenle/:id', isAdmin, (req, res) => {
+  const media = prepare('SELECT * FROM media WHERE id = ?').get(req.params.id);
+  if (!media) return res.redirect('/admin');
+  const categories = prepare('SELECT * FROM categories ORDER BY name').all();
+  res.render('admin/edit', { media, categories, session: req.session, error: null });
+});
+
+router.post('/duzenle/:id', isAdmin, (req, res) => {
+  const { title, description, category_id } = req.body;
+  prepare('UPDATE media SET title = ?, description = ?, category_id = ? WHERE id = ?').run(
+    [title, description, category_id || null, req.params.id]
+  );
+  res.redirect('/admin');
 });
 
 router.post('/sil/:id', isAdmin, async (req, res) => {

@@ -16,21 +16,21 @@
     <h1>Medya Yükle</h1>
     <% if (error) { %><div class="alert error"><%= error %></div><% } %>
 
-    <form method="POST" action="/admin/yukle" enctype="multipart/form-data" class="upload-form">
+    <form method="POST" action="/admin/yukle" enctype="multipart/form-data" class="upload-form" id="uploadForm">
       <div class="form-group">
-        <label>Dosya Seç (Fotoğraf veya Video)</label>
+        <label>Dosyaları Seç (Çoklu seçim desteklenir)</label>
         <div class="file-drop" id="fileDrop">
-          <input type="file" name="file" id="fileInput" accept="image/*,video/*" required>
-          <div class="drop-text">
-            <span>📁 Dosyayı buraya sürükle veya tıkla</span>
-            <small>Fotoğraf: JPG, PNG, GIF, WebP | Video: MP4, MOV, AVI, MKV (max 500MB)</small>
+          <input type="file" name="file" id="fileInput" accept="image/*,video/*" multiple>
+          <div class="drop-text" id="dropText">
+            <span>📁 Dosyaları buraya sürükle veya tıkla</span>
+            <small>Birden fazla dosya seçebilirsin • JPG, PNG, MP4, MOV... (max 500MB/dosya)</small>
           </div>
-          <div id="filePreview" class="file-preview hidden"></div>
+          <div id="filePreview" class="file-preview-grid hidden"></div>
         </div>
       </div>
 
       <div class="form-group">
-        <label>Başlık</label>
+        <label>Başlık <small style="color:var(--text3);font-weight:400;">(Çoklu yüklemede otomatik numara eklenir)</small></label>
         <input type="text" name="title" required placeholder="İçerik başlığı">
       </div>
 
@@ -51,60 +51,119 @@
 
       <div class="progress-bar hidden" id="progressBar">
         <div class="progress-fill" id="progressFill"></div>
-        <span id="progressText">0%</span>
       </div>
+      <span id="progressText" style="font-size:0.85rem;font-weight:600;color:var(--text2);"></span>
 
-      <button type="submit" class="btn-primary btn-large">⬆ Yükle</button>
+      <button type="submit" class="btn-primary btn-large" id="submitBtn">⬆ Yükle</button>
     </form>
   </main>
 </div>
 
+<style>
+.file-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 8px; padding: 12px;
+}
+.preview-item {
+  position: relative; aspect-ratio: 1;
+  border-radius: 4px; overflow: hidden; background: var(--bg3);
+}
+.preview-item img, .preview-item video {
+  width: 100%; height: 100%; object-fit: cover;
+}
+.preview-item .remove-btn {
+  position: absolute; top: 4px; right: 4px;
+  background: rgba(0,0,0,0.7); color: #fff; border: none;
+  width: 20px; height: 20px; border-radius: 50%; cursor: pointer;
+  font-size: 0.7rem; display: flex; align-items: center; justify-content: center;
+}
+.preview-count {
+  text-align: center; padding: 8px; color: var(--text2);
+  font-size: 0.85rem; font-weight: 600;
+}
+</style>
+
 <script>
 const fileInput = document.getElementById('fileInput');
 const preview = document.getElementById('filePreview');
-const dropText = document.querySelector('.drop-text');
+const dropText = document.getElementById('dropText');
+let selectedFiles = [];
 
 fileInput.addEventListener('change', () => {
-  const file = fileInput.files[0];
-  if (!file) return;
-  preview.innerHTML = '';
-  preview.classList.remove('hidden');
-  dropText.classList.add('hidden');
-
-  if (file.type.startsWith('image/')) {
-    const img = document.createElement('img');
-    img.src = URL.createObjectURL(file);
-    preview.appendChild(img);
-  } else {
-    const vid = document.createElement('video');
-    vid.src = URL.createObjectURL(file);
-    vid.controls = true;
-    preview.appendChild(vid);
-  }
-  const info = document.createElement('p');
-  info.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(1)} MB)`;
-  preview.appendChild(info);
+  selectedFiles = Array.from(fileInput.files);
+  renderPreviews();
 });
 
-// Upload progress
-document.querySelector('.upload-form').addEventListener('submit', function(e) {
+// Drag & drop
+const fileDrop = document.getElementById('fileDrop');
+fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.style.borderColor = 'var(--text)'; });
+fileDrop.addEventListener('dragleave', () => { fileDrop.style.borderColor = ''; });
+fileDrop.addEventListener('drop', e => {
+  e.preventDefault(); fileDrop.style.borderColor = '';
+  selectedFiles = Array.from(e.dataTransfer.files).filter(f => f.type.match(/image|video/));
+  renderPreviews();
+});
+
+function renderPreviews() {
+  if (selectedFiles.length === 0) {
+    preview.classList.add('hidden');
+    dropText.classList.remove('hidden');
+    return;
+  }
+  preview.classList.remove('hidden');
+  dropText.classList.add('hidden');
+  preview.innerHTML = `<div class="preview-count" style="grid-column:1/-1;">${selectedFiles.length} dosya seçildi</div>`;
+
+  selectedFiles.slice(0, 20).forEach((file, i) => {
+    const div = document.createElement('div');
+    div.className = 'preview-item';
+    const url = URL.createObjectURL(file);
+    if (file.type.startsWith('image/')) {
+      div.innerHTML = `<img src="${url}"><button class="remove-btn" data-i="${i}">✕</button>`;
+    } else {
+      div.innerHTML = `<video src="${url}"></video><button class="remove-btn" data-i="${i}">✕</button>`;
+    }
+    preview.appendChild(div);
+  });
+
+  preview.querySelectorAll('.remove-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      selectedFiles.splice(parseInt(btn.dataset.i), 1);
+      renderPreviews();
+    });
+  });
+}
+
+// Upload with progress
+document.getElementById('uploadForm').addEventListener('submit', function(e) {
   e.preventDefault();
-  const form = this;
-  const formData = new FormData(form);
-  const xhr = new XMLHttpRequest();
+  if (selectedFiles.length === 0) return alert('Dosya seçilmedi');
+
+  const formData = new FormData(this);
+  formData.delete('file');
+  selectedFiles.forEach(f => formData.append('file', f));
+
   const bar = document.getElementById('progressBar');
   const fill = document.getElementById('progressFill');
   const text = document.getElementById('progressText');
+  const btn = document.getElementById('submitBtn');
 
   bar.classList.remove('hidden');
-  xhr.upload.addEventListener('progress', (e) => {
+  btn.disabled = true;
+  btn.textContent = 'Yükleniyor...';
+
+  const xhr = new XMLHttpRequest();
+  xhr.upload.addEventListener('progress', e => {
     if (e.lengthComputable) {
       const pct = Math.round((e.loaded / e.total) * 100);
       fill.style.width = pct + '%';
-      text.textContent = pct + '%';
+      text.textContent = `${pct}% — ${selectedFiles.length} dosya yükleniyor...`;
     }
   });
   xhr.addEventListener('load', () => { window.location.href = '/admin'; });
+  xhr.addEventListener('error', () => { btn.disabled = false; btn.textContent = '⬆ Yükle'; text.textContent = 'Hata oluştu, tekrar dene.'; });
   xhr.open('POST', '/admin/yukle');
   xhr.send(formData);
 });

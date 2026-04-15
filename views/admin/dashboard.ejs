@@ -49,9 +49,12 @@
             <td><%= item.downloads %></td>
             <td><%= new Date(item.created_at).toLocaleDateString('tr-TR') %></td>
             <td>
-              <form method="POST" action="/admin/sil/<%= item.id %>" onsubmit="return confirm('Silmek istediğinize emin misiniz?')">
-                <button type="submit" class="btn-danger">Sil</button>
-              </form>
+              <div style="display:flex;gap:8px;">
+                <a href="/admin/duzenle/<%= item.id %>" class="btn-primary" style="padding:6px 14px;font-size:0.78px;">Düzenle</a>
+                <form method="POST" action="/admin/sil/<%= item.id %>" onsubmit="return confirm('Silmek istediğinize emin misiniz?')">
+                  <button type="submit" class="btn-danger">Sil</button>
+                </form>
+              </div>
             </td>
           </tr>
           <% }) %>

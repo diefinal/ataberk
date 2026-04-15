@@ -497,3 +497,37 @@ img, video { max-width: 100%; display: block; }
 .reaction-btn.active { border-color: var(--accent); background: rgba(200,16,46,0.08); }
 .reaction-btn .emoji { font-size: 1.2rem; line-height: 1; }
 .reaction-btn .count { color: var(--text2); font-size: 0.82rem; min-width: 12px; }
+
+/* ── NAV ARAMA ── */
+.nav-search { display: flex; align-items: center; }
+.nav-search input {
+  background: rgba(255,255,255,0.08); border: 1px solid #333;
+  color: #ccc; padding: 5px 12px; font-size: 0.82rem;
+  border-radius: 4px 0 0 4px; font-family: inherit; width: 140px;
+  transition: border-color 0.2s;
+}
+.nav-search input:focus { outline: none; border-color: var(--accent); background: rgba(255,255,255,0.12); }
+.nav-search input::placeholder { color: #555; }
+.nav-search button {
+  background: #333; border: 1px solid #333; border-left: none;
+  color: #ccc; padding: 5px 10px; cursor: pointer;
+  border-radius: 0 4px 4px 0; font-size: 0.85rem; transition: background 0.2s;
+}
+.nav-search button:hover { background: var(--accent); border-color: var(--accent); }
+
+/* ── ARAMA SAYFASI ── */
+.search-hero { margin-bottom: 40px; }
+.search-form { display: flex; gap: 0; max-width: 600px; margin-top: 20px; }
+.search-form input {
+  flex: 1; background: #fff; border: 2px solid var(--text);
+  color: var(--text); padding: 14px 18px; font-family: inherit;
+  font-size: 1rem; border-radius: 0;
+}
+.search-form input:focus { outline: none; border-color: var(--accent); }
+.search-form button {
+  background: var(--dark); color: #fff; border: 2px solid var(--dark);
+  padding: 14px 24px; font-size: 0.9rem; font-weight: 700;
+  cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+  transition: background 0.2s;
+}
+.search-form button:hover { background: var(--accent); border-color: var(--accent); }

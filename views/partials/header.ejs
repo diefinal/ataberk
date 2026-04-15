@@ -26,6 +26,10 @@
         </div>
       </div>
       <% } %>
+      <form action="/ara" method="GET" class="nav-search">
+        <input type="text" name="q" placeholder="Ara...">
+        <button type="submit">🔍</button>
+      </form>
       <% if (typeof session !== 'undefined' && session.user) { %>
       <a href="/admin" class="btn-admin">Admin</a>
       <% } else if (typeof session !== 'undefined' && session.verified) { %>

@@ -1,0 +1,53 @@
+<%- include('../partials/header', { title: 'İçerik Düzenle' }) %>
+
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <h2>Admin Panel</h2>
+    <nav>
+      <a href="/admin">📊 Dashboard</a>
+      <a href="/admin/yukle">⬆ Yükle</a>
+      <a href="/admin/kategoriler">📁 Kategoriler</a>
+      <a href="/admin/yorumlar">💬 Yorumlar</a>
+      <a href="/admin/cikis">🚪 Çıkış</a>
+    </nav>
+  </aside>
+
+  <main class="admin-main">
+    <h1>İçerik Düzenle</h1>
+    <% if (error) { %><div class="alert error"><%= error %></div><% } %>
+
+    <div style="margin-bottom:24px;">
+      <% if (media.type === 'image') { %>
+      <img src="<%= media.filename %>" style="max-height:200px;border-radius:4px;">
+      <% } else { %>
+      <video src="<%= media.filename %>" controls style="max-height:200px;border-radius:4px;"></video>
+      <% } %>
+    </div>
+
+    <form method="POST" action="/admin/duzenle/<%= media.id %>" class="upload-form">
+      <div class="form-group">
+        <label>Başlık</label>
+        <input type="text" name="title" value="<%= media.title %>" required>
+      </div>
+      <div class="form-group">
+        <label>Açıklama</label>
+        <textarea name="description" rows="3"><%= media.description || '' %></textarea>
+      </div>
+      <div class="form-group">
+        <label>Kategori</label>
+        <select name="category_id">
+          <option value="">Kategori Seç</option>
+          <% categories.forEach(cat => { %>
+          <option value="<%= cat.id %>" <%= media.category_id == cat.id ? 'selected' : '' %>><%= cat.name %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div style="display:flex;gap:12px;">
+        <button type="submit" class="btn-primary">💾 Kaydet</button>
+        <a href="/admin" style="padding:10px 20px;color:var(--text2);font-size:0.85rem;display:flex;align-items:center;">İptal</a>
+      </div>
+    </form>
+  </main>
+</div>
+
+<%- include('../partials/footer') %>

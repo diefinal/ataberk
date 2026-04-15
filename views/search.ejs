@@ -1,0 +1,47 @@
+<%- include('partials/header', { title: 'Arama' }) %>
+
+<section class="section">
+  <div class="container">
+    <div class="search-hero">
+      <h1 class="page-title">🔍 Arama</h1>
+      <form class="search-form" action="/ara" method="GET">
+        <input type="text" name="q" value="<%= q %>" placeholder="Başlık, açıklama veya kategori..." autofocus>
+        <button type="submit">Ara</button>
+      </form>
+    </div>
+
+    <% if (q) { %>
+    <div class="section-header">
+      <h2 class="section-title"><span>"<%= q %>"</span> için sonuçlar</h2>
+      <span class="section-link"><%= results.length %> sonuç</span>
+    </div>
+    <% if (results.length > 0) { %>
+    <div class="media-grid">
+      <% results.forEach(item => { %>
+      <a href="/medya/<%= item.id %>" class="media-card">
+        <div class="media-thumb">
+          <% if (item.type === 'image') { %>
+          <img src="<%= item.filename %>" alt="<%= item.title %>" loading="lazy">
+          <% } else { %>
+          <div class="video-thumb">
+            <video src="<%= item.filename %>" preload="metadata"></video>
+            <span class="play-icon">▶</span>
+          </div>
+          <% } %>
+          <div class="media-overlay">
+            <% if (item.category_name) { %><span class="tag"><%= item.category_name %></span><% } %>
+            <h3><%= item.title %></h3>
+            <div class="meta"><span>👁 <%= item.views %></span><span>⬇ <%= item.downloads %></span></div>
+          </div>
+        </div>
+      </a>
+      <% }) %>
+    </div>
+    <% } else { %>
+    <p class="empty">Sonuç bulunamadı.</p>
+    <% } %>
+    <% } %>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

@@ -63,4 +63,18 @@ router.get('/videolar', (req, res) => {
   res.render('videos', { categories, mediaList, session: req.session });
 });
 
+// Arama
+router.get('/ara', (req, res) => {
+  const q = req.query.q?.trim();
+  const categories = prepare('SELECT * FROM categories ORDER BY name').all();
+  if (!q) return res.render('search', { categories, results: [], q: '', session: req.session });
+  const results = prepare(`
+    SELECT m.*, c.name as category_name 
+    FROM media m LEFT JOIN categories c ON m.category_id = c.id 
+    WHERE m.title LIKE ? OR m.description LIKE ? OR c.name LIKE ?
+    ORDER BY m.created_at DESC
+  `).all([`%${q}%`, `%${q}%`, `%${q}%`]);
+  res.render('search', { categories, results, q, session: req.session });
+});
+
 module.exports = router;
