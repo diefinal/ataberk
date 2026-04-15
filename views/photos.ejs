@@ -7,7 +7,7 @@
       <% mediaList.forEach(item => { %>
       <a href="/medya/<%= item.id %>" class="media-card">
         <div class="media-thumb">
-          <img src="/uploads/<%= item.filename %>" alt="<%= item.title %>" loading="lazy">
+          <img src="<%= item.filename %>" alt="<%= item.title %>" loading="lazy">
         </div>
         <div class="media-info">
           <h3><%= item.title %></h3>
