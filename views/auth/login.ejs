@@ -120,6 +120,7 @@
         <input type="email" name="email" placeholder="E-posta adresiniz" required autofocus>
         <button type="submit">Kod Gönder →</button>
       </form>
+      <a href="/admin/giris" class="back-link">🔐 Admin girişi</a>
     <% } else { %>
       <p class="login-subtitle">E-postanıza 6 haneli doğrulama kodu gönderdik.</p>
       <% if (error) { %><div class="alert"><%= error %></div><% } %>
