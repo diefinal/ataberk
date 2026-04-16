@@ -7,13 +7,11 @@ function generateCode() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-// GET /giris
 router.get('/', (req, res) => {
   if (req.session.verified) return res.redirect('/');
   res.render('auth/login', { error: null, step: 'email' });
 });
 
-// POST /giris - e-posta gönder
 router.post('/', async (req, res) => {
   const { email } = req.body;
   if (!email || !email.includes('@')) {
@@ -23,8 +21,8 @@ router.post('/', async (req, res) => {
   const code = generateCode();
   const expires = Date.now() + 10 * 60 * 1000;
 
-  prepare('DELETE FROM otp_codes WHERE email = ?').run(email.toLowerCase());
-  prepare('INSERT INTO otp_codes (email, code, expires_at) VALUES (?, ?, ?)').run(
+  await prepare('DELETE FROM otp_codes WHERE email = $1').run([email.toLowerCase()]);
+  await prepare('INSERT INTO otp_codes (email, code, expires_at) VALUES ($1, $2, $3)').run(
     [email.toLowerCase(), code, expires]
   );
 

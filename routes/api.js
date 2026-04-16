@@ -4,59 +4,55 @@ const { prepare } = require('../db');
 
 const EMOJIS = ['❤️', '😍', '🔥', '👏'];
 
-// Yorum ekle
-router.post('/yorum/:mediaId', (req, res) => {
+router.post('/yorum/:mediaId', async (req, res) => {
   const { author, content } = req.body;
   if (!author || !content) return res.status(400).json({ error: 'Eksik bilgi' });
   if (content.length > 500) return res.status(400).json({ error: 'Yorum çok uzun' });
-  prepare('INSERT INTO comments (media_id, author, content) VALUES (?, ?, ?)').run(
+  await prepare('INSERT INTO comments (media_id, author, content) VALUES ($1, $2, $3)').run(
     [req.params.mediaId, author.trim(), content.trim()]
   );
   res.json({ success: true });
 });
 
-// Reaksiyon ekle/değiştir/kaldır
-router.post('/reaksiyon/:mediaId', (req, res) => {
+router.post('/reaksiyon/:mediaId', async (req, res) => {
   const { emoji } = req.body;
   const email = req.session.visitorEmail || req.session.user?.username;
   if (!email) return res.status(401).json({ error: 'Giriş gerekli' });
   if (!EMOJIS.includes(emoji)) return res.status(400).json({ error: 'Geçersiz reaksiyon' });
 
-  const existing = prepare('SELECT * FROM reactions WHERE media_id = ? AND email = ?').get([req.params.mediaId, email]);
+  const existing = await prepare('SELECT * FROM reactions WHERE media_id = $1 AND email = $2').get([req.params.mediaId, email]);
   if (existing) {
     if (existing.emoji === emoji) {
-      prepare('DELETE FROM reactions WHERE id = ?').run(existing.id);
+      await prepare('DELETE FROM reactions WHERE id = $1').run([existing.id]);
     } else {
-      prepare('UPDATE reactions SET emoji = ? WHERE id = ?').run([emoji, existing.id]);
+      await prepare('UPDATE reactions SET emoji = $1 WHERE id = $2').run([emoji, existing.id]);
     }
   } else {
-    prepare('INSERT INTO reactions (media_id, email, emoji) VALUES (?, ?, ?)').run([req.params.mediaId, email, emoji]);
+    await prepare('INSERT INTO reactions (media_id, email, emoji) VALUES ($1, $2, $3)').run([req.params.mediaId, email, emoji]);
   }
 
   const counts = {};
   EMOJIS.forEach(e => { counts[e] = 0; });
-  const rows = prepare('SELECT emoji, COUNT(*) as count FROM reactions WHERE media_id = ? GROUP BY emoji').all(req.params.mediaId);
-  rows.forEach(r => { counts[r.emoji] = r.count; });
-  const userEmoji = prepare('SELECT emoji FROM reactions WHERE media_id = ? AND email = ?').get([req.params.mediaId, email]);
+  const rows = await prepare('SELECT emoji, COUNT(*) as count FROM reactions WHERE media_id = $1 GROUP BY emoji').all([req.params.mediaId]);
+  rows.forEach(r => { counts[r.emoji] = parseInt(r.count); });
+  const userEmoji = await prepare('SELECT emoji FROM reactions WHERE media_id = $1 AND email = $2').get([req.params.mediaId, email]);
   res.json({ success: true, counts, userEmoji: userEmoji?.emoji || null });
 });
 
-// Reaksiyonları getir
-router.get('/reaksiyon/:mediaId', (req, res) => {
+router.get('/reaksiyon/:mediaId', async (req, res) => {
   const email = req.session.visitorEmail || req.session.user?.username;
   const counts = {};
   EMOJIS.forEach(e => { counts[e] = 0; });
-  const rows = prepare('SELECT emoji, COUNT(*) as count FROM reactions WHERE media_id = ? GROUP BY emoji').all(req.params.mediaId);
-  rows.forEach(r => { counts[r.emoji] = r.count; });
-  const userEmoji = email ? prepare('SELECT emoji FROM reactions WHERE media_id = ? AND email = ?').get([req.params.mediaId, email]) : null;
+  const rows = await prepare('SELECT emoji, COUNT(*) as count FROM reactions WHERE media_id = $1 GROUP BY emoji').all([req.params.mediaId]);
+  rows.forEach(r => { counts[r.emoji] = parseInt(r.count); });
+  const userEmoji = email ? await prepare('SELECT emoji FROM reactions WHERE media_id = $1 AND email = $2').get([req.params.mediaId, email]) : null;
   res.json({ counts, userEmoji: userEmoji?.emoji || null });
 });
 
-// İndirme
-router.get('/indir/:id', (req, res) => {
-  const media = prepare('SELECT * FROM media WHERE id = ?').get(req.params.id);
+router.get('/indir/:id', async (req, res) => {
+  const media = await prepare('SELECT * FROM media WHERE id = $1').get([req.params.id]);
   if (!media) return res.status(404).send('Bulunamadı');
-  prepare('UPDATE media SET downloads = downloads + 1 WHERE id = ?').run(media.id);
+  await prepare('UPDATE media SET downloads = downloads + 1 WHERE id = $1').run([media.id]);
   const url = media.filename.replace('/upload/', '/upload/fl_attachment/');
   res.redirect(url);
 });

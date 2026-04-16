@@ -5,7 +5,6 @@ const multer = require('multer');
 const { prepare } = require('../db');
 const { uploadFile, deleteFile } = require('../cloudinary');
 
-// Multer - memory storage (Cloudinary'e göndereceğiz)
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 500 * 1024 * 1024 },
@@ -27,9 +26,9 @@ router.get('/giris', (req, res) => {
   res.render('admin/login', { error: null });
 });
 
-router.post('/giris', (req, res) => {
+router.post('/giris', async (req, res) => {
   const { username, password } = req.body;
-  const user = prepare('SELECT * FROM users WHERE username = ?').get(username);
+  const user = await prepare('SELECT * FROM users WHERE username = $1').get([username]);
   if (user && bcrypt.compareSync(password, user.password) && user.is_admin) {
     req.session.user = user;
     return res.redirect('/admin');
@@ -42,25 +41,25 @@ router.get('/cikis', (req, res) => {
   res.redirect('/');
 });
 
-router.get('/', isAdmin, (req, res) => {
+router.get('/', isAdmin, async (req, res) => {
   const stats = {
-    images: prepare("SELECT COUNT(*) as count FROM media WHERE type='image'").get().count,
-    videos: prepare("SELECT COUNT(*) as count FROM media WHERE type='video'").get().count,
-    comments: prepare("SELECT COUNT(*) as count FROM comments").get().count,
-    categories: prepare("SELECT COUNT(*) as count FROM categories").get().count,
+    images: (await prepare("SELECT COUNT(*) as count FROM media WHERE type='image'").get([])).count,
+    videos: (await prepare("SELECT COUNT(*) as count FROM media WHERE type='video'").get([])).count,
+    comments: (await prepare("SELECT COUNT(*) as count FROM comments").get([])).count,
+    categories: (await prepare("SELECT COUNT(*) as count FROM categories").get([])).count,
   };
-  const recentMedia = prepare('SELECT * FROM media ORDER BY created_at DESC LIMIT 10').all();
+  const recentMedia = await prepare('SELECT * FROM media ORDER BY created_at DESC LIMIT 10').all();
   res.render('admin/dashboard', { stats, recentMedia, session: req.session });
 });
 
-router.get('/yukle', isAdmin, (req, res) => {
-  const categories = prepare('SELECT * FROM categories ORDER BY name').all();
+router.get('/yukle', isAdmin, async (req, res) => {
+  const categories = await prepare('SELECT * FROM categories ORDER BY name').all();
   res.render('admin/upload', { categories, session: req.session, error: null });
 });
 
 router.post('/yukle', isAdmin, upload.array('file', 50), async (req, res) => {
   if (!req.files || req.files.length === 0) {
-    const categories = prepare('SELECT * FROM categories ORDER BY name').all();
+    const categories = await prepare('SELECT * FROM categories ORDER BY name').all();
     return res.render('admin/upload', { categories, session: req.session, error: 'Dosya seçilmedi' });
   }
   try {
@@ -70,38 +69,36 @@ router.post('/yukle', isAdmin, upload.array('file', 50), async (req, res) => {
       const type = file.mimetype.startsWith('video/') ? 'video' : 'image';
       const result = await uploadFile(file.buffer, file.mimetype, file.originalname);
       const fileTitle = req.files.length === 1 ? title : `${title} ${i + 1}`;
-      prepare('INSERT INTO media (title, description, type, filename, category_id) VALUES (?, ?, ?, ?, ?)').run(
+      await prepare('INSERT INTO media (title, description, type, filename, category_id) VALUES ($1, $2, $3, $4, $5)').run(
         [fileTitle, description, type, result.url, category_id || null]
       );
     }
     res.redirect('/admin');
   } catch (e) {
     console.error('Upload hatası:', e.message);
-    const categories = prepare('SELECT * FROM categories ORDER BY name').all();
+    const categories = await prepare('SELECT * FROM categories ORDER BY name').all();
     res.render('admin/upload', { categories, session: req.session, error: 'Yükleme başarısız: ' + e.message });
   }
 });
 
-// İçerik düzenle
-router.get('/duzenle/:id', isAdmin, (req, res) => {
-  const media = prepare('SELECT * FROM media WHERE id = ?').get(req.params.id);
+router.get('/duzenle/:id', isAdmin, async (req, res) => {
+  const media = await prepare('SELECT * FROM media WHERE id = $1').get([req.params.id]);
   if (!media) return res.redirect('/admin');
-  const categories = prepare('SELECT * FROM categories ORDER BY name').all();
+  const categories = await prepare('SELECT * FROM categories ORDER BY name').all();
   res.render('admin/edit', { media, categories, session: req.session, error: null });
 });
 
-router.post('/duzenle/:id', isAdmin, (req, res) => {
+router.post('/duzenle/:id', isAdmin, async (req, res) => {
   const { title, description, category_id } = req.body;
-  prepare('UPDATE media SET title = ?, description = ?, category_id = ? WHERE id = ?').run(
+  await prepare('UPDATE media SET title = $1, description = $2, category_id = $3 WHERE id = $4').run(
     [title, description, category_id || null, req.params.id]
   );
   res.redirect('/admin');
 });
 
 router.post('/sil/:id', isAdmin, async (req, res) => {
-  const media = prepare('SELECT * FROM media WHERE id = ?').get(req.params.id);
+  const media = await prepare('SELECT * FROM media WHERE id = $1').get([req.params.id]);
   if (media) {
-    // Cloudinary'den sil (URL'den public_id çıkar)
     try {
       const url = media.filename;
       const parts = url.split('/');
@@ -111,13 +108,13 @@ router.post('/sil/:id', isAdmin, async (req, res) => {
       const public_id = folder + '/' + file;
       await deleteFile(public_id, media.type === 'video' ? 'video' : 'image');
     } catch (e) {}
-    prepare('DELETE FROM media WHERE id = ?').run(media.id);
+    await prepare('DELETE FROM media WHERE id = $1').run([media.id]);
   }
   res.redirect('/admin');
 });
 
-router.get('/kategoriler', isAdmin, (req, res) => {
-  const categories = prepare(`
+router.get('/kategoriler', isAdmin, async (req, res) => {
+  const categories = await prepare(`
     SELECT c.*, COUNT(m.id) as media_count 
     FROM categories c LEFT JOIN media m ON c.id = m.category_id 
     GROUP BY c.id ORDER BY c.name
@@ -125,22 +122,22 @@ router.get('/kategoriler', isAdmin, (req, res) => {
   res.render('admin/categories', { categories, session: req.session, error: null });
 });
 
-router.post('/kategoriler/ekle', isAdmin, (req, res) => {
+router.post('/kategoriler/ekle', isAdmin, async (req, res) => {
   const { name, description } = req.body;
   const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
   try {
-    prepare('INSERT INTO categories (name, slug, description) VALUES (?, ?, ?)').run([name, slug, description]);
+    await prepare('INSERT INTO categories (name, slug, description) VALUES ($1, $2, $3)').run([name, slug, description]);
   } catch (e) {}
   res.redirect('/admin/kategoriler');
 });
 
-router.post('/kategoriler/sil/:id', isAdmin, (req, res) => {
-  prepare('DELETE FROM categories WHERE id = ?').run(req.params.id);
+router.post('/kategoriler/sil/:id', isAdmin, async (req, res) => {
+  await prepare('DELETE FROM categories WHERE id = $1').run([req.params.id]);
   res.redirect('/admin/kategoriler');
 });
 
-router.get('/yorumlar', isAdmin, (req, res) => {
-  const comments = prepare(`
+router.get('/yorumlar', isAdmin, async (req, res) => {
+  const comments = await prepare(`
     SELECT c.*, m.title as media_title, m.id as media_id 
     FROM comments c JOIN media m ON c.media_id = m.id 
     ORDER BY c.created_at DESC
@@ -148,8 +145,8 @@ router.get('/yorumlar', isAdmin, (req, res) => {
   res.render('admin/comments', { comments, session: req.session });
 });
 
-router.post('/yorumlar/sil/:id', isAdmin, (req, res) => {
-  prepare('DELETE FROM comments WHERE id = ?').run(req.params.id);
+router.post('/yorumlar/sil/:id', isAdmin, async (req, res) => {
+  await prepare('DELETE FROM comments WHERE id = $1').run([req.params.id]);
   res.redirect('/admin/yorumlar');
 });
 

@@ -40,19 +40,19 @@ const requireAuth = (req, res, next) => {
 const authRouter = require('./routes/auth');
 app.use('/giris', authRouter);
 
-app.post('/dogrula', (req, res) => {
+app.post('/dogrula', async (req, res) => {
   const { code } = req.body;
   const email = req.session.pendingEmail;
   if (!email) return res.redirect('/giris');
 
   const { prepare } = require('./db');
-  const record = prepare('SELECT * FROM otp_codes WHERE email = ? AND used = 0 ORDER BY id DESC LIMIT 1').get(email);
+  const record = await prepare('SELECT * FROM otp_codes WHERE email = $1 AND used = 0 ORDER BY id DESC LIMIT 1').get([email]);
 
   if (!record) return res.render('auth/login', { error: 'Kod bulunamadı. Tekrar deneyin.', step: 'code' });
   if (Date.now() > record.expires_at) return res.render('auth/login', { error: 'Kodun süresi doldu.', step: 'email' });
   if (record.code !== code.trim()) return res.render('auth/login', { error: 'Hatalı kod.', step: 'code' });
 
-  prepare('UPDATE otp_codes SET used = 1 WHERE id = ?').run(record.id);
+  await prepare('UPDATE otp_codes SET used = 1 WHERE id = $1').run([record.id]);
   req.session.verified = true;
   req.session.visitorEmail = email;
   delete req.session.pendingEmail;
