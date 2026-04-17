@@ -531,3 +531,7 @@ img, video { max-width: 100%; display: block; }
   transition: background 0.2s;
 }
 .search-form button:hover { background: var(--accent); border-color: var(--accent); }
+
+/* ── PAGİNATİON ── */
+.pagination { display: flex; gap: 12px; margin-top: 40px; justify-content: center; }
+.pagination a { padding: 10px 24px; }

@@ -1,0 +1,46 @@
+<%- include('partials/header', { title: 'YouTube Videoları' }) %>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h1 class="section-title">▶ YouTube <span>Videoları</span></h1>
+      <a href="https://youtube.com/<%= process.env.YOUTUBE_CHANNEL %>" target="_blank" class="section-link">Kanala Git →</a>
+    </div>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+    <p class="empty">Videolar yüklenemedi: <%= error %></p>
+    <% } else if (videos.length === 0) { %>
+    <p class="empty">Video bulunamadı.</p>
+    <% } else { %>
+    <div class="media-grid">
+      <% videos.forEach(video => { %>
+      <a href="/youtube/video/<%= video.id.videoId %>" class="media-card">
+        <div class="media-thumb">
+          <img src="<%= video.snippet.thumbnails.medium?.url || video.snippet.thumbnails.default?.url %>" 
+               alt="<%= video.snippet.title %>" loading="lazy">
+          <div class="media-overlay">
+            <span class="tag">YouTube</span>
+            <h3><%= video.snippet.title %></h3>
+            <div class="meta">
+              <span>📅 <%= new Date(video.snippet.publishedAt).toLocaleDateString('tr-TR') %></span>
+            </div>
+          </div>
+          <span class="play-icon">▶</span>
+        </div>
+      </a>
+      <% }) %>
+    </div>
+
+    <div class="pagination">
+      <% if (prevPage) { %>
+      <a href="/youtube?page=<%= prevPage %>" class="btn-primary">← Önceki</a>
+      <% } %>
+      <% if (nextPage) { %>
+      <a href="/youtube?page=<%= nextPage %>" class="btn-primary">Sonraki →</a>
+      <% } %>
+    </div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('partials/footer') %>
