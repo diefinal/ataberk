@@ -1,5 +1,30 @@
 <%- include('partials/header', { title: 'Ana Sayfa' }) %>
 
+<% if (justLoggedIn) { %>
+<script>
+window.addEventListener('load', () => {
+  const colors=['#6f3cff','#ffd92f','#ff8e32','#c8102e','#fff','#4a7ab5'];
+  for(let i=0;i<100;i++) setTimeout(()=>{
+    const c=document.createElement('div');
+    c.style.cssText=`position:fixed;top:-10px;left:${Math.random()*100}vw;width:${Math.random()*8+4}px;height:${Math.random()*8+4}px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>.5?'50%':'2px'};z-index:9999;pointer-events:none;animation:cfFall ${Math.random()*2+1.5}s ease forwards;`;
+    document.body.appendChild(c); setTimeout(()=>c.remove(),3500);
+  },i*25);
+  try {
+    const ac=new AudioContext();
+    [523,659,784,1047].forEach((freq,i)=>{
+      const o=ac.createOscillator(),g=ac.createGain();
+      o.connect(g);g.connect(ac.destination);
+      o.frequency.value=freq;o.type='sine';
+      const t=ac.currentTime+i*0.12;
+      g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.15,t+0.05);g.gain.exponentialRampToValueAtTime(0.001,t+0.2);
+      o.start(t);o.stop(t+0.25);
+    });
+  } catch(e){}
+});
+</script>
+<style>@keyframes cfFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}</style>
+<% } %>
+
 <section class="hero">
   <div class="container">
     <div class="hero-inner">

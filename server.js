@@ -55,6 +55,7 @@ app.post('/dogrula', async (req, res) => {
   await prepare('UPDATE otp_codes SET used = 1 WHERE id = $1').run([record.id]);
   req.session.verified = true;
   req.session.visitorEmail = email;
+  req.session.justLoggedIn = true;
   delete req.session.pendingEmail;
   res.redirect('/');
 });

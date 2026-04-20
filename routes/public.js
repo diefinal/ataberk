@@ -9,7 +9,9 @@ router.get('/', async (req, res) => {
     FROM media m LEFT JOIN categories c ON m.category_id = c.id 
     ORDER BY m.created_at DESC LIMIT 12
   `).all();
-  res.render('index', { categories, recentMedia, session: req.session });
+  const justLoggedIn = req.session.justLoggedIn || false;
+  req.session.justLoggedIn = false;
+  res.render('index', { categories, recentMedia, session: req.session, justLoggedIn });
 });
 
 router.get('/kategori/:slug', async (req, res) => {
