@@ -1,0 +1,83 @@
+<%- include('../partials/header', { title: 'Hafıza Oyunu', categories: [] }) %>
+<section class="section">
+<div class="container">
+  <div class="game-header">
+    <a href="/oyunlar" class="back-game">← Oyunlar</a>
+    <h1>🃏 Hafıza Oyunu</h1>
+  </div>
+  <div class="game-wrap">
+    <div class="game-info-bar">
+      <span>Hamle: <strong id="moves">0</strong></span>
+      <span>Eşleşme: <strong id="matches">0</strong>/8</span>
+      <button id="restart" class="game-btn-primary">Yeniden</button>
+    </div>
+    <div id="memBoard"></div>
+    <p class="game-hint">Aynı kartları bul ve eşleştir</p>
+  </div>
+</div>
+</section>
+<style>
+#memBoard{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;width:360px;margin:0 auto;}
+.mem-card{width:80px;height:80px;perspective:600px;cursor:pointer;}
+.mem-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform 0.4s;}
+.mem-card.flipped .mem-inner,.mem-card.matched .mem-inner{transform:rotateY(180deg);}
+.mem-front,.mem-back{position:absolute;inset:0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:2rem;backface-visibility:hidden;}
+.mem-front{background:var(--dark);color:var(--accent);font-size:1.5rem;}
+.mem-back{background:var(--bg2);border:2px solid var(--border);transform:rotateY(180deg);}
+.mem-card.matched .mem-back{border-color:var(--accent);background:rgba(200,16,46,0.1);}
+</style>
+<script>
+const EMOJIS=['🐧','🦊','🐸','🦁','🐙','🦋','🐳','🦄'];
+let cards=[], flipped=[], moves=0, matches=0, lock=false;
+
+function shuffle(arr){return arr.sort(()=>Math.random()-.5);}
+
+function init(){
+  moves=0; matches=0; flipped=[]; lock=false;
+  document.getElementById('moves').textContent=0;
+  document.getElementById('matches').textContent=0;
+  cards=shuffle([...EMOJIS,...EMOJIS]).map((e,i)=>({id:i,emoji:e,matched:false}));
+  render();
+}
+
+function render(){
+  const b=document.getElementById('memBoard'); b.innerHTML='';
+  cards.forEach(card=>{
+    const d=document.createElement('div');
+    d.className='mem-card'+(card.matched?' matched':'');
+    d.innerHTML=`<div class="mem-inner"><div class="mem-front">❓</div><div class="mem-back">${card.emoji}</div></div>`;
+    d.addEventListener('click',()=>flip(card,d));
+    b.appendChild(d);
+  });
+}
+
+function flip(card, el){
+  if(lock||card.matched||flipped.find(f=>f.card.id===card.id)) return;
+  el.classList.add('flipped');
+  flipped.push({card,el});
+  if(flipped.length===2){
+    moves++;
+    document.getElementById('moves').textContent=moves;
+    lock=true;
+    setTimeout(()=>{
+      const [a,b]=flipped;
+      if(a.card.emoji===b.card.emoji){
+        a.card.matched=b.card.matched=true;
+        a.el.classList.add('matched'); b.el.classList.add('matched');
+        matches++;
+        document.getElementById('matches').textContent=matches;
+        if(matches===8){
+          setTimeout(()=>alert(`Tebrikler! 🎉 ${moves} hamlede tamamladın!`),300);
+        }
+      } else {
+        a.el.classList.remove('flipped'); b.el.classList.remove('flipped');
+      }
+      flipped=[]; lock=false;
+    },800);
+  }
+}
+
+document.getElementById('restart').addEventListener('click',init);
+init();
+</script>
+<%- include('../partials/footer') %>

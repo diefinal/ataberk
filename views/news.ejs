@@ -1,0 +1,46 @@
+<%- include('partials/header', { title: 'Haberler' }) %>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h1 class="section-title">📰 <span>Haberler</span></h1>
+      <span class="section-link" style="color:var(--text3);font-size:0.78rem;">Her 10 dakikada güncellenir</span>
+    </div>
+
+    <!-- Kaynak sekmeleri -->
+    <div class="news-tabs">
+      <% feeds.forEach(feed => { %>
+      <a href="/haberler?kaynak=<%= feed.name %>"
+         class="news-tab <%= activeFeed.name === feed.name ? 'active' : '' %>"
+         style="--tab-color:<%= feed.color %>">
+        <%= feed.icon %> <%= feed.name %>
+      </a>
+      <% }) %>
+    </div>
+
+    <!-- Haberler -->
+    <% if (activeFeed.items.length === 0) { %>
+    <p class="empty">Haberler yüklenemedi. Lütfen daha sonra tekrar deneyin.</p>
+    <% } else { %>
+    <div class="news-grid">
+      <% activeFeed.items.forEach((item, i) => { %>
+      <a href="<%= item.link %>" target="_blank" rel="noopener" class="news-card <%= i === 0 ? 'featured' : '' %>">
+        <% if (item.image) { %>
+        <div class="news-img">
+          <img src="<%= item.image %>" alt="<%= item.title %>" loading="lazy" onerror="this.parentElement.style.display='none'">
+        </div>
+        <% } %>
+        <div class="news-content">
+          <span class="news-source" style="color:<%= activeFeed.color %>"><%= activeFeed.icon %> <%= activeFeed.name %></span>
+          <h3><%= item.title %></h3>
+          <% if (item.summary) { %><p class="news-summary"><%= item.summary %>...</p><% } %>
+          <span class="news-date">🕐 <%= item.date.toLocaleDateString('tr-TR', {day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}) %></span>
+        </div>
+      </a>
+      <% }) %>
+    </div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

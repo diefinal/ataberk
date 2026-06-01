@@ -1,0 +1,21 @@
+<%- include('../partials/header', { title: 'Oyunlar', categories: [] }) %>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h1 class="section-title">🎮 <span>Oyunlar</span></h1>
+    </div>
+    <div class="games-grid">
+      <% games.forEach(game => { %>
+      <a href="/oyunlar/<%= game.id %>" class="game-card">
+        <span class="game-icon"><%= game.icon %></span>
+        <h3><%= game.name %></h3>
+        <p><%= game.desc %></p>
+        <span class="game-btn">Oyna →</span>
+      </a>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

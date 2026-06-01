@@ -7,7 +7,7 @@ const { uploadFile, deleteFile } = require('../cloudinary');
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 500 * 1024 * 1024 },
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB (sıkıştırılmış gelir)
   fileFilter: (req, file, cb) => {
     const allowed = /jpeg|jpg|png|gif|webp|mp4|mov|avi|mkv|webm/;
     const ext = allowed.test(file.originalname.toLowerCase().split('.').pop());
@@ -57,8 +57,9 @@ router.get('/yukle', isAdmin, async (req, res) => {
   res.render('admin/upload', { categories, session: req.session, error: null });
 });
 
-router.post('/yukle', isAdmin, upload.array('file', 50), async (req, res) => {
-  if (!req.files || req.files.length === 0) {
+router.post('/yukle', isAdmin, upload.any(), async (req, res) => {
+  const files = req.files?.filter(f => ['file'].includes(f.fieldname)) || [];
+  if (files.length === 0) {
     const categories = await prepare('SELECT * FROM categories ORDER BY name').all();
     return res.render('admin/upload', { categories, session: req.session, error: 'Dosya seçilmedi' });
   }

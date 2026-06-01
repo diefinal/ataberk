@@ -23,6 +23,9 @@ async function uploadFile(buffer, mimetype, originalname) {
     resource_type: isVideo ? 'video' : 'image',
     folder: 'ataberktasci',
     use_filename: false,
+    quality: 'auto',
+    fetch_format: 'auto',
+    transformation: isVideo ? [] : [{ quality: 'auto:good', fetch_format: 'auto' }]
   });
   return {
     url: result.secure_url,

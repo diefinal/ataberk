@@ -1,0 +1,70 @@
+<%- include('../partials/header', { title: 'Tic-Tac-Toe', categories: [] }) %>
+<section class="section">
+<div class="container">
+  <div class="game-header">
+    <a href="/oyunlar" class="back-game">← Oyunlar</a>
+    <h1>❌ Tic-Tac-Toe</h1>
+  </div>
+  <div class="game-wrap">
+    <div class="game-info-bar">
+      <span id="status">Sıra: ❌</span>
+      <span>❌ <strong id="scoreX">0</strong> — ⭕ <strong id="scoreO">0</strong></span>
+      <button id="reset" class="game-btn-primary">Yeniden</button>
+    </div>
+    <div id="tttBoard"></div>
+    <p class="game-hint">İki kişilik oyun</p>
+  </div>
+</div>
+</section>
+<style>
+#tttBoard{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:300px;margin:0 auto;}
+.ttt-cell{width:92px;height:92px;background:var(--bg2);border:2px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:2.5rem;cursor:pointer;transition:all 0.2s;}
+.ttt-cell:hover{border-color:var(--accent);background:var(--bg3);}
+.ttt-cell.win{background:rgba(200,16,46,0.15);border-color:var(--accent);}
+</style>
+<script>
+let board=Array(9).fill(''), current='X', sX=0, sO=0;
+const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
+function render(){
+  const b=document.getElementById('tttBoard'); b.innerHTML='';
+  board.forEach((v,i)=>{
+    const c=document.createElement('div'); c.className='ttt-cell';
+    c.textContent=v==='X'?'❌':v==='O'?'⭕':'';
+    c.addEventListener('click',()=>play(i));
+    b.appendChild(c);
+  });
+}
+
+function checkWin(){
+  for(const [a,b,c] of wins){
+    if(board[a]&&board[a]===board[b]&&board[a]===board[c]) return [a,b,c];
+  }
+  return null;
+}
+
+function play(i){
+  if(board[i]) return;
+  board[i]=current;
+  const w=checkWin();
+  if(w){
+    document.querySelectorAll('.ttt-cell').forEach((c,i)=>{if(w.includes(i))c.classList.add('win');});
+    document.getElementById('status').textContent=`${current==='X'?'❌':'⭕'} Kazandı! 🎉`;
+    if(current==='X'){sX++;document.getElementById('scoreX').textContent=sX;}
+    else{sO++;document.getElementById('scoreO').textContent=sO;}
+    return;
+  }
+  if(board.every(v=>v)){document.getElementById('status').textContent='Berabere! 🤝';return;}
+  current=current==='X'?'O':'X';
+  document.getElementById('status').textContent=`Sıra: ${current==='X'?'❌':'⭕'}`;
+  render();
+}
+
+document.getElementById('reset').addEventListener('click',()=>{
+  board=Array(9).fill(''); current='X';
+  document.getElementById('status').textContent='Sıra: ❌';
+  render();
+});
+render();
+</script>
+<%- include('../partials/footer') %>

@@ -68,6 +68,8 @@ app.get('/cikis-yap', (req, res) => {
 
 app.use('/admin', require('./routes/admin')); // auth middleware'den önce
 app.use('/youtube', requireAuth, require('./routes/youtube'));
+app.use('/haberler', require('./routes/news')); // auth gerekmez
+app.use('/oyunlar', require('./routes/games')); // auth gerekmez
 app.use('/', requireAuth, require('./routes/public'));
 app.use('/api', requireAuth, require('./routes/api'));
 

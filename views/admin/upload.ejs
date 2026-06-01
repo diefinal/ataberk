@@ -136,14 +136,10 @@ function renderPreviews() {
   });
 }
 
-// Upload with progress
-document.getElementById('uploadForm').addEventListener('submit', function(e) {
+// Upload with progress + otomatik sıkıştırma
+document.getElementById('uploadForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   if (selectedFiles.length === 0) return alert('Dosya seçilmedi');
-
-  const formData = new FormData(this);
-  formData.delete('file');
-  selectedFiles.forEach(f => formData.append('file', f));
 
   const bar = document.getElementById('progressBar');
   const fill = document.getElementById('progressFill');
@@ -152,6 +148,47 @@ document.getElementById('uploadForm').addEventListener('submit', function(e) {
 
   bar.classList.remove('hidden');
   btn.disabled = true;
+  btn.textContent = 'Hazırlanıyor...';
+
+  // Resimleri sıkıştır
+  async function compressImage(file) {
+    if (!file.type.startsWith('image/')) return file; // video olduğu gibi gönder
+    return new Promise(resolve => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        const MAX = 1920;
+        let w = img.width, h = img.height;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        canvas.toBlob(blob => {
+          URL.revokeObjectURL(url);
+          resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+        }, 'image/jpeg', 0.85);
+      };
+      img.src = url;
+    });
+  }
+
+  text.textContent = 'Resimler sıkıştırılıyor...';
+  const compressed = await Promise.all(selectedFiles.map(compressImage));
+
+  const formData = new FormData();
+  // Form alanlarını ekle
+  const titleInput = document.querySelector('input[name="title"]');
+  const descInput = document.querySelector('textarea[name="description"]');
+  const catInput = document.querySelector('select[name="category_id"]');
+  if (titleInput) formData.append('title', titleInput.value);
+  if (descInput) formData.append('description', descInput.value);
+  if (catInput) formData.append('category_id', catInput.value);
+  // Dosyaları ekle
+  compressed.forEach(f => formData.append('file', f, f.name));
+
   btn.textContent = 'Yükleniyor...';
 
   const xhr = new XMLHttpRequest();
@@ -159,7 +196,7 @@ document.getElementById('uploadForm').addEventListener('submit', function(e) {
     if (e.lengthComputable) {
       const pct = Math.round((e.loaded / e.total) * 100);
       fill.style.width = pct + '%';
-      text.textContent = `${pct}% — ${selectedFiles.length} dosya yükleniyor...`;
+      text.textContent = `${pct}% — ${compressed.length} dosya yükleniyor...`;
     }
   });
   xhr.addEventListener('load', () => { window.location.href = '/admin'; });

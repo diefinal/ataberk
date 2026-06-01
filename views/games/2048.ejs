@@ -1,0 +1,91 @@
+<%- include('../partials/header', { title: '2048', categories: [] }) %>
+<section class="section">
+<div class="container">
+  <div class="game-header">
+    <a href="/oyunlar" class="back-game">← Oyunlar</a>
+    <h1>🧩 2048</h1>
+  </div>
+  <div class="game-wrap">
+    <div class="game-info-bar">
+      <span>Skor: <strong id="score">0</strong></span>
+      <span>En Yüksek: <strong id="best">0</strong></span>
+      <button id="newGame" class="game-btn-primary">Yeni Oyun</button>
+    </div>
+    <div id="board2048"></div>
+    <p class="game-hint">⬆⬇⬅➡ ile kaydır | Mobil: Kaydır</p>
+  </div>
+</div>
+</section>
+<style>
+#board2048{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;background:#bbada0;padding:8px;border-radius:8px;width:360px;margin:0 auto;}
+.tile{width:80px;height:80px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:900;border-radius:6px;transition:all 0.1s;}
+.t0{background:#cdc1b4;color:#cdc1b4;}
+.t2{background:#eee4da;color:#776e65;}
+.t4{background:#ede0c8;color:#776e65;}
+.t8{background:#f2b179;color:#fff;}
+.t16{background:#f59563;color:#fff;}
+.t32{background:#f67c5f;color:#fff;}
+.t64{background:#f65e3b;color:#fff;}
+.t128{background:#edcf72;color:#fff;font-size:1.1rem;}
+.t256{background:#edcc61;color:#fff;font-size:1.1rem;}
+.t512{background:#edc850;color:#fff;font-size:1rem;}
+.t1024{background:#edc53f;color:#fff;font-size:0.9rem;}
+.t2048{background:#edc22e;color:#fff;font-size:0.85rem;}
+</style>
+<script>
+let grid, score=0, best=0;
+function newGrid(){return Array(4).fill(null).map(()=>Array(4).fill(0));}
+function addRandom(g){
+  const empty=[];
+  g.forEach((r,i)=>r.forEach((v,j)=>{if(!v)empty.push([i,j]);}));
+  if(!empty.length)return;
+  const [i,j]=empty[Math.floor(Math.random()*empty.length)];
+  g[i][j]=Math.random()<0.9?2:4;
+}
+function render(){
+  const b=document.getElementById('board2048'); b.innerHTML='';
+  grid.forEach(row=>row.forEach(v=>{
+    const d=document.createElement('div');
+    d.className=`tile t${v>2048?2048:v}`;
+    d.textContent=v||'';
+    b.appendChild(d);
+  }));
+  document.getElementById('score').textContent=score;
+  document.getElementById('best').textContent=best;
+}
+function slide(row){
+  let r=row.filter(v=>v);
+  for(let i=0;i<r.length-1;i++){if(r[i]===r[i+1]){r[i]*=2;score+=r[i];r.splice(i+1,1);i++;}}
+  while(r.length<4)r.push(0);
+  return r;
+}
+function move(dir){
+  let moved=false;
+  const g=grid.map(r=>[...r]);
+  if(dir==='left'){grid=grid.map(r=>{const s=slide(r);if(s.join()!==r.join())moved=true;return s;});}
+  else if(dir==='right'){grid=grid.map(r=>{const s=slide([...r].reverse()).reverse();if(s.join()!==r.join())moved=true;return s;});}
+  else if(dir==='up'){
+    for(let j=0;j<4;j++){const col=grid.map(r=>r[j]);const s=slide(col);s.forEach((v,i)=>{if(grid[i][j]!==v)moved=true;grid[i][j]=v;});}
+  }
+  else if(dir==='down'){
+    for(let j=0;j<4;j++){const col=grid.map(r=>r[j]).reverse();const s=slide(col).reverse();s.forEach((v,i)=>{if(grid[i][j]!==v)moved=true;grid[i][j]=v;});}
+  }
+  if(moved){addRandom(grid);if(score>best)best=score;render();}
+}
+function start(){grid=newGrid();score=0;addRandom(grid);addRandom(grid);render();}
+document.getElementById('newGame').addEventListener('click',start);
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowLeft')move('left');
+  else if(e.key==='ArrowRight')move('right');
+  else if(e.key==='ArrowUp')move('up');
+  else if(e.key==='ArrowDown')move('down');
+});
+let tx=0,ty=0;
+document.getElementById('board2048').addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+document.getElementById('board2048').addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)){move(dx>0?'right':'left');}else{move(dy>0?'down':'up');}
+},{passive:true});
+start();
+</script>
+<%- include('../partials/footer') %>

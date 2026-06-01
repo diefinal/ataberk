@@ -1,0 +1,131 @@
+<%- include('../partials/header', { title: 'Tetris', categories: [] }) %>
+<section class="section">
+<div class="container">
+  <div class="game-header">
+    <a href="/oyunlar" class="back-game">← Oyunlar</a>
+    <h1>🎮 Tetris</h1>
+  </div>
+  <div class="game-wrap" style="display:flex;gap:24px;align-items:flex-start;justify-content:center;flex-wrap:wrap;">
+    <canvas id="tetris" width="200" height="400" style="border:2px solid var(--border);border-radius:4px;"></canvas>
+    <div style="display:flex;flex-direction:column;gap:16px;min-width:120px;">
+      <div class="game-info-bar" style="flex-direction:column;align-items:flex-start;">
+        <span>Skor</span><strong id="score" style="font-size:1.5rem;">0</strong>
+        <span style="margin-top:8px;">Seviye</span><strong id="level" style="font-size:1.2rem;">1</strong>
+        <span style="margin-top:8px;">Satır</span><strong id="lines">0</strong>
+      </div>
+      <button id="startBtn" class="game-btn-primary">Başla</button>
+      <div>
+        <p style="font-size:0.78rem;color:var(--text2);line-height:1.8;">
+          ⬅➡ Hareket<br>⬆ Döndür<br>⬇ Hızlı in<br>Space: Düşür
+        </p>
+      </div>
+    </div>
+  </div>
+  <p class="game-hint">Mobil: Sol/Sağ kaydır, Yukarı kaydır=döndür, Aşağı kaydır=düşür</p>
+</div>
+</section>
+<script>
+const canvas=document.getElementById('tetris'), ctx=canvas.getContext('2d');
+const W=10, H=20, SZ=20;
+const COLORS=['','#c8102e','#6f3cff','#ffd92f','#ff8e32','#2ecc71','#3498db','#e91e63'];
+const PIECES=[
+  [[1,1,1,1]],
+  [[2,2],[2,2]],
+  [[0,3,0],[3,3,3]],
+  [[4,0],[4,0],[4,4]],
+  [[0,5],[0,5],[5,5]],
+  [[6,6,0],[0,6,6]],
+  [[0,7,7],[7,7,0]]
+];
+
+let board, piece, pos, score, level, lines, running=false, interval;
+
+function newBoard(){return Array(H).fill(null).map(()=>Array(W).fill(0));}
+function randPiece(){const p=PIECES[Math.floor(Math.random()*PIECES.length)];return{shape:p,color:p[0].find(v=>v)};}
+
+function draw(){
+  ctx.fillStyle='#111'; ctx.fillRect(0,0,W*SZ,H*SZ);
+  // Grid
+  ctx.strokeStyle='#1a1a1a';
+  for(let i=0;i<=W;i++){ctx.beginPath();ctx.moveTo(i*SZ,0);ctx.lineTo(i*SZ,H*SZ);ctx.stroke();}
+  for(let i=0;i<=H;i++){ctx.beginPath();ctx.moveTo(0,i*SZ);ctx.lineTo(W*SZ,i*SZ);ctx.stroke();}
+  // Board
+  board.forEach((row,y)=>row.forEach((v,x)=>{if(v){ctx.fillStyle=COLORS[v];ctx.fillRect(x*SZ+1,y*SZ+1,SZ-2,SZ-2);}}));
+  // Piece
+  if(piece) piece.shape.forEach((row,y)=>row.forEach((v,x)=>{if(v){ctx.fillStyle=COLORS[v];ctx.fillRect((pos.x+x)*SZ+1,(pos.y+y)*SZ+1,SZ-2,SZ-2);}}));
+}
+
+function valid(shape,p){
+  return shape.every((row,y)=>row.every((v,x)=>!v||((pos.x||p.x)+x>=0&&(pos.x||p.x)+x<W&&(pos.y||p.y)+y<H&&!board[(pos.y||p.y)+y]?.[(pos.x||p.x)+x])));
+}
+
+function validPos(shape,px,py){
+  return shape.every((row,y)=>row.every((v,x)=>!v||(px+x>=0&&px+x<W&&py+y<H&&!board[py+y]?.[px+x])));
+}
+
+function place(){
+  piece.shape.forEach((row,y)=>row.forEach((v,x)=>{if(v)board[pos.y+y][pos.x+x]=v;}));
+  // Clear lines
+  let cleared=0;
+  for(let y=H-1;y>=0;y--){
+    if(board[y].every(v=>v)){board.splice(y,1);board.unshift(Array(W).fill(0));cleared++;y++;}
+  }
+  if(cleared){lines+=cleared;score+=cleared*100*level;if(lines%10===0)level++;
+    document.getElementById('score').textContent=score;
+    document.getElementById('level').textContent=level;
+    document.getElementById('lines').textContent=lines;
+    clearInterval(interval);interval=setInterval(tick,Math.max(100,500-level*40));
+  }
+  piece=randPiece(); pos={x:Math.floor(W/2)-1,y:0};
+  if(!validPos(piece.shape,pos.x,pos.y)){
+    clearInterval(interval);running=false;
+    ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(0,0,W*SZ,H*SZ);
+    ctx.fillStyle='#fff';ctx.font='bold 20px Arial';ctx.textAlign='center';
+    ctx.fillText('Oyun Bitti!',W*SZ/2,H*SZ/2-20);
+    ctx.font='14px Arial';ctx.fillText('Skor: '+score,W*SZ/2,H*SZ/2+10);
+    document.getElementById('startBtn').textContent='Tekrar Oyna';
+  }
+}
+
+function tick(){
+  if(!validPos(piece.shape,pos.x,pos.y+1)){place();}
+  else{pos.y++;} draw();
+}
+
+function rotate(shape){return shape[0].map((_,i)=>shape.map(r=>r[i]).reverse());}
+
+document.addEventListener('keydown',e=>{
+  if(!running)return;
+  if(e.key==='ArrowLeft'&&validPos(piece.shape,pos.x-1,pos.y))pos.x--;
+  else if(e.key==='ArrowRight'&&validPos(piece.shape,pos.x+1,pos.y))pos.x++;
+  else if(e.key==='ArrowDown'&&validPos(piece.shape,pos.x,pos.y+1))pos.y++;
+  else if(e.key==='ArrowUp'){const r=rotate(piece.shape);if(validPos(r,pos.x,pos.y))piece.shape=r;}
+  else if(e.key===' '){while(validPos(piece.shape,pos.x,pos.y+1))pos.y++;place();}
+  draw();
+});
+
+// Touch
+let tx=0,ty=0;
+canvas.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+canvas.addEventListener('touchend',e=>{
+  if(!running)return;
+  const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)){if(dx>0&&validPos(piece.shape,pos.x+1,pos.y))pos.x++;else if(dx<0&&validPos(piece.shape,pos.x-1,pos.y))pos.x--;}
+  else if(dy<-30){const r=rotate(piece.shape);if(validPos(r,pos.x,pos.y))piece.shape=r;}
+  else if(dy>30){while(validPos(piece.shape,pos.x,pos.y+1))pos.y++;place();}
+  draw();
+},{passive:true});
+
+document.getElementById('startBtn').addEventListener('click',()=>{
+  board=newBoard();score=0;level=1;lines=0;running=true;
+  piece=randPiece();pos={x:Math.floor(W/2)-1,y:0};
+  document.getElementById('score').textContent=0;
+  document.getElementById('level').textContent=1;
+  document.getElementById('lines').textContent=0;
+  document.getElementById('startBtn').textContent='Yeniden Başla';
+  clearInterval(interval);interval=setInterval(tick,500);
+  draw();
+});
+draw();
+</script>
+<%- include('../partials/footer') %>
