@@ -134,7 +134,14 @@ input[name="code"]{letter-spacing:8px;font-size:1.4rem;text-align:center;font-we
         <button class="login-btn" type="submit" id="submitBtn">Kod Gönder →</button>
         <div class="message" id="message"></div>
       </form>
-      <a href="/admin/giris" class="admin-link">🔐 Admin girişi</a>
+      <div style="margin-top: 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; border-top: 1px solid #eee; padding-top: 20px;">
+        <div style="display: flex; gap: 16px; justify-content: center; width: 100%;">
+          <a href="/haberler" style="color: #6f3cff; font-weight: 700; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 4px;">📰 Haberler</a>
+          <span style="color: #ccc;">|</span>
+          <a href="/oyunlar" style="color: #6f3cff; font-weight: 700; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 4px;">🎮 Oyunlar</a>
+        </div>
+        <a href="/admin/giris" class="admin-link" style="margin-top: 4px;">🔐 Admin girişi</a>
+      </div>
 
       <% } else { %>
       <div class="subtitle">E-postana 6 haneli kod gönderdik</div>

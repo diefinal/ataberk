@@ -37,6 +37,8 @@
       <a href="/admin" class="btn-admin">Admin</a>
       <% } else if (typeof session !== 'undefined' && session.verified) { %>
       <a href="/cikis-yap">Çıkış</a>
+      <% } else { %>
+      <a href="/giris" class="btn-login">Giriş Yap</a>
       <% } %>
     </div>
   </div>

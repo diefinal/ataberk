@@ -53,11 +53,11 @@ img, video { max-width: 100%; display: block; }
   border-right: 1px solid #333; transition: color 0.2s, background 0.2s;
 }
 .nav-links a:hover { color: #fff; background: #222; }
-.btn-admin {
+.btn-admin, .btn-login {
   background: var(--accent) !important; color: #fff !important;
   border-right: none !important;
 }
-.btn-admin:hover { background: var(--accent2) !important; }
+.btn-admin:hover, .btn-login:hover { background: var(--accent2) !important; }
 
 .dropdown { position: relative; display: flex; align-items: center; }
 .dropdown > span {
