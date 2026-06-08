@@ -14,7 +14,7 @@ const parser = new Parser({
 });
 
 const FEEDS = [
-  { name: 'NTV', url: 'https://www.ntv.com.tr/son-dakika.rss', color: '#e63946', icon: '📺' },
+  { name: 'Sözcü', url: 'https://www.sozcu.com.tr/rss/son-dakika.xml', color: '#d62828', icon: '📰' },
   { name: 'Hürriyet Spor', url: 'https://www.hurriyet.com.tr/rss/spor', color: '#2196f3', icon: '⚽' },
   { name: 'Milliyet Spor', url: 'https://www.milliyet.com.tr/rss/rssNew/spor', color: '#ff6b35', icon: '🏆' },
 ];
@@ -64,7 +64,7 @@ async function getFeed(feed) {
 router.get('/', async (req, res) => {
   const { prepare } = require('../db');
   const categories = await prepare('SELECT * FROM categories ORDER BY name').all();
-  const activeTab = req.query.kaynak || 'NTV';
+  const activeTab = req.query.kaynak || 'Sözcü';
 
   const allFeeds = await Promise.all(FEEDS.map(async f => ({
     ...f,
