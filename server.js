@@ -70,14 +70,89 @@ app.use('/admin', require('./routes/admin')); // auth middleware'den önce
 app.use('/youtube', requireAuth, require('./routes/youtube'));
 app.use('/haberler', require('./routes/news')); // auth gerekmez
 app.use('/oyunlar', require('./routes/games')); // auth gerekmez
+app.use('/taksi', require('./routes/taksi')); // auth gerekmez
 app.use('/', requireAuth, require('./routes/public'));
 app.use('/api', requireAuth, require('./routes/api'));
+
+// Taksi Sıra Takip Arka Plan Servisi (Çoklu Kullanıcı Uyumlu)
+async function startTaksiMonitor() {
+  const taksiState = require('./routes/taksi-state');
+  
+  async function checkQueue() {
+    try {
+      const data = await taksiState.fetchQueueData();
+      const currentSehirici = parseInt(data.sehirici, 10);
+      const currentSehirdisi = parseInt(data.sehirdisi, 10);
+      const sehiriciDongu = parseInt(data.sehirici_dongu, 10) || 0;
+      const sehirdisiDongu = parseInt(data.sehirdisi_dongu, 10) || 0;
+      
+      const lastState = taksiState.lastSeenState;
+      let hasChanges = false;
+
+      // 1. Şehiriçi Değişim Kontrolü
+      if (!isNaN(currentSehirici) && (lastState.sehirici.number !== currentSehirici || lastState.sehirici.dongu !== sehiriciDongu)) {
+        console.log(`[Taksi Sunucu - Şehiriçi] Değişim: ${lastState.sehirici.number || 'Yok'} -> ${currentSehirici}`);
+        lastState.sehirici.number = currentSehirici;
+        lastState.sehirici.dongu = sehiriciDongu;
+        hasChanges = true;
+
+        // Aboneleri tara ve bildir
+        taksiState.activeSubscriptions.forEach(async (sub) => {
+          if (sub.sehiriciEnabled && currentSehirici >= sub.sehiriciRangeStart && currentSehirici <= sub.sehiriciRangeEnd) {
+            if (sub.lastSehiriciVal !== currentSehirici) {
+              sub.lastSehiriciVal = currentSehirici;
+              sub.lastUpdated = Date.now();
+              const msg = `Şehiriçi sırası ${currentSehirici} oldu! (${sub.sehiriciRangeStart}-${sub.sehiriciRangeEnd} aralığı).`;
+              console.log(`[ALARM] [Şehiriçi] Sent to ${sub.ntfyTopic}: ${msg}`);
+              await taksiState.sendPushNotification(sub.ntfyTopic, msg, '🚨 ŞEHİRİÇİ SIRA UYARISI', 'taxi,warning,rotating_light');
+            }
+          }
+        });
+      }
+
+      // 2. Şehirdışı Değişim Kontrolü
+      if (!isNaN(currentSehirdisi) && (lastState.sehirdisi.number !== currentSehirdisi || lastState.sehirdisi.dongu !== sehirdisiDongu)) {
+        console.log(`[Taksi Sunucu - Şehirdışı] Değişim: ${lastState.sehirdisi.number || 'Yok'} -> ${currentSehirdisi}`);
+        lastState.sehirdisi.number = currentSehirdisi;
+        lastState.sehirdisi.dongu = sehirdisiDongu;
+        hasChanges = true;
+
+        // Aboneleri tara ve bildir
+        taksiState.activeSubscriptions.forEach(async (sub) => {
+          if (sub.sehirdisiEnabled && currentSehirdisi >= sub.sehirdisiRangeStart && currentSehirdisi <= sub.sehirdisiRangeEnd) {
+            if (sub.lastSehirdisiVal !== currentSehirdisi) {
+              sub.lastSehirdisiVal = currentSehirdisi;
+              sub.lastUpdated = Date.now();
+              const msg = `Şehirdışı sırası ${currentSehirdisi} oldu! (${sub.sehirdisiRangeStart}-${sub.sehirdisiRangeEnd} aralığı).`;
+              console.log(`[ALARM] [Şehirdışı] Sent to ${sub.ntfyTopic}: ${msg}`);
+              await taksiState.sendPushNotification(sub.ntfyTopic, msg, '🚨 ŞEHİRDIŞI SIRA UYARISI', 'taxi,warning,bullettrain_side');
+            }
+          }
+        });
+      }
+
+      if (hasChanges) {
+        taksiState.saveSubscriptions();
+      }
+
+    } catch (err) {
+      console.error('[Taksi Sunucu] Hata:', err.message);
+    }
+    
+    // Her 10 saniyede bir kontrol et
+    setTimeout(checkQueue, 10000);
+  }
+
+  // Takibi başlat
+  checkQueue();
+}
 
 // DB başlat, sonra sunucuyu aç
 initDb().then(() => {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`Adres: http://localhost:${PORT}`);
+    startTaksiMonitor(); // Taksi takip motorunu başlat
   });
 }).catch(err => {
   console.error('DB başlatma hatası:', err);

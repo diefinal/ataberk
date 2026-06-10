@@ -1,0 +1,220 @@
+<%- include('partials/header', { title: 'Taksi Canlı Sıra & Alarm' }) %>
+
+<link rel="stylesheet" href="/css/taksi.css">
+<!-- FontAwesome for Icons (if not present) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="taksi-page-wrapper">
+  <div class="background-decor">
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+  </div>
+
+  <div class="taksi-container">
+    <!-- Header info banner -->
+    <div class="taksi-info-banner">
+      <div class="logo-area">
+        <div class="logo-icon"><i class="fa-solid fa-taxi"></i></div>
+        <div>
+          <h2>Taksi Sıra Takip Uyarısı</h2>
+          <p class="subtitle">Antalya Havalimanı Canlı Alarm Sistemi (Çoklu Kullanıcı)</p>
+        </div>
+      </div>
+      <div class="connection-badge" id="connBadge">
+        <span class="dot pulse"></span>
+        <span class="badge-text">Sunucu Bağlantısı Aktif</span>
+      </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="main-grid">
+      
+      <!-- Left Column: Settings and Setup -->
+      <section class="grid-col left-col">
+        <!-- ntfy Setup Guide Card -->
+        <div class="card glass setup-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fa-solid fa-mobile-screen-button header-icon"></i>
+              <h3>1. Adım: Telefona Bildirim Kurulumu</h3>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="setup-desc">
+              Telefonunuz cebinizde veya ekran kilitliyken bile sesli/titreşimli bildirim almak için <strong>ntfy</strong> uygulamasını indirin.
+            </p>
+            <div class="download-buttons">
+              <a href="https://play.google.com/store/apps/details?id=io.heckel.ntfy" target="_blank" class="download-btn android">
+                <i class="fa-brands fa-android"></i> Play Store (Android)
+              </a>
+              <a href="https://apps.apple.com/us/app/ntfy/id1625396389" target="_blank" class="download-btn ios">
+                <i class="fa-brands fa-apple"></i> App Store (iPhone)
+              </a>
+            </div>
+            <div class="instruction-box">
+              <span class="step-num">1</span>
+              <p>Telefon uygulamasında sağ üstteki <strong>"+" (Abone Ol)</strong> butonuna basın.</p>
+            </div>
+            <div class="instruction-box">
+              <span class="step-num">2</span>
+              <p>Kendinize özel bir konu adı belirleyin (Örn: <code class="highlight">antalya-taksi-150</code>) ve abone olun.</p>
+            </div>
+            <div class="instruction-box">
+              <span class="step-num">3</span>
+              <p>Belirlediğiniz konu adını aşağıdaki kutuya yazıp kaydedin.</p>
+            </div>
+            
+            <div class="form-group ntfy-group">
+              <label for="ntfyTopicInput">ntfy Konu Adı:</label>
+              <div class="input-with-button">
+                <input type="text" id="ntfyTopicInput" placeholder="Örn: antalya-taksi-150">
+                <button type="button" id="btnTestPush" class="btn btn-secondary">
+                  <i class="fa-solid fa-paper-plane"></i> Test Et
+                </button>
+              </div>
+              <small class="help-text">Abone olduğunuz konunun birebir aynısını yazın.</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alarm Settings Card -->
+        <div class="card glass settings-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fa-solid fa-bell-concierge header-icon"></i>
+              <h3>2. Adım: Sıra Alarm Ayarları</h3>
+            </div>
+          </div>
+          <div class="card-body">
+            <!-- City Center Queue Configuration -->
+            <div class="queue-setting-box">
+              <div class="setting-toggle">
+                <h4><i class="fa-solid fa-city icon-small"></i> ŞEHİRİÇİ SIRA TAKİBİ</h4>
+                <label class="switch">
+                  <input type="checkbox" id="sehiriciToggle" checked>
+                  <span class="slider round"></span>
+                </label>
+              </div>
+              <div class="range-config" id="sehiriciRangeConfig">
+                <div class="range-inputs">
+                  <div class="num-input-group">
+                    <label for="sehiriciStart">Başlangıç Sırası:</label>
+                    <input type="number" id="sehiriciStart" min="1" max="999" value="105">
+                  </div>
+                  <div class="num-input-group">
+                    <label for="sehiriciEnd">Bitiş Sırası:</label>
+                    <input type="number" id="sehiriciEnd" min="1" max="999" value="115">
+                  </div>
+                </div>
+                <div class="helper-text-calc">
+                  <span>Öneri: Kapı numaranız <strong>150</strong> ise alarm aralığını <strong>105 - 115</strong> arası ayarlayabilirsiniz.</span>
+                </div>
+              </div>
+            </div>
+
+            <hr class="separator">
+
+            <!-- Out of City Queue Configuration -->
+            <div class="queue-setting-box">
+              <div class="setting-toggle">
+                <h4><i class="fa-solid fa-road icon-small"></i> ŞEHİRDIŞI SIRA TAKİBİ</h4>
+                <label class="switch">
+                  <input type="checkbox" id="sehirdisiToggle">
+                  <span class="slider round"></span>
+                </label>
+              </div>
+              <div class="range-config disabled" id="sehirdisiRangeConfig">
+                <div class="range-inputs">
+                  <div class="num-input-group">
+                    <label for="sehirdisiStart">Başlangıç Sırası:</label>
+                    <input type="number" id="sehirdisiStart" min="1" max="999" value="105" disabled>
+                  </div>
+                  <div class="num-input-group">
+                    <label for="sehirdisiEnd">Bitiş Sırası:</label>
+                    <input type="number" id="sehirdisiEnd" min="1" max="999" value="115" disabled>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Save Settings Button -->
+            <button type="button" id="btnSaveSettings" class="btn btn-primary btn-block">
+              <i class="fa-solid fa-floppy-disk"></i> Alarmı Kur ve Takibi Başlat
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Live Status & Log -->
+      <section class="grid-col right-col">
+        
+        <!-- Live Queue Display -->
+        <div class="card glass live-status-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fa-solid fa-circle-dot header-icon pulse-red"></i>
+              <h3>Canlı Sıra Durumu</h3>
+            </div>
+            <span class="update-countdown" id="updateCountdown">Güncelleniyor...</span>
+          </div>
+          
+          <div class="card-body live-displays">
+            <!-- City Center Display -->
+            <div class="display-box glass-inset" id="sehiriciBox">
+              <span class="display-label">ŞEHİRİÇİ EN BAŞTAKİ</span>
+              <div class="display-num" id="sehiriciVal">-</div>
+              <div class="display-badge" id="sehiriciBadge">Yükleniyor...</div>
+            </div>
+            
+            <!-- Out of City Display -->
+            <div class="display-box glass-inset" id="sehirdisiBox">
+              <span class="display-label">ŞEHİRDIŞI EN BAŞTAKİ</span>
+              <div class="display-num" id="sehirdisiVal">-</div>
+              <div class="display-badge" id="sehirdisiBadge">Yükleniyor...</div>
+            </div>
+          </div>
+          
+          <!-- Announcement (Duyuru) area -->
+          <div class="announcement-area">
+            <h4><i class="fa-solid fa-bullhorn text-orange"></i> Güncel Yönetici Duyurusu</h4>
+            <div class="announcement-content" id="duyuruVal">Yükleniyor...</div>
+          </div>
+        </div>
+
+        <!-- System Logs & Performance Info -->
+        <div class="card glass logs-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fa-solid fa-clock-rotate-left header-icon"></i>
+              <h3>Sıra Değişim Geçmişi & Analiz</h3>
+            </div>
+            <button id="btnClearLogs" class="btn-text">Temizle</button>
+          </div>
+          <div class="card-body">
+            <!-- Stats -->
+            <div class="stats-row">
+              <div class="stat-item">
+                <span class="stat-label">Ort. İlerleme Hızı</span>
+                <span class="stat-val" id="statSpeed">Hesaplanıyor...</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Toplam Değişim</span>
+                <span class="stat-val" id="statTotal">0</span>
+              </div>
+            </div>
+            <!-- Log window -->
+            <div class="log-window" id="logWindow">
+              <div class="log-entry system">Uygulama başlatıldı. Sıra verileri bekleniyor...</div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script src="/js/taksi-client.js"></script>
+
+<%- include('partials/footer') %>
