@@ -77,6 +77,7 @@ module.exports = {
   saveSubscriptions,
   fetchQueueData,
   sendPushNotification,
+  latestQueueData: null,
   lastSeenState: {
     sehirici: { number: null, dongu: null },
     sehirdisi: { number: null, dongu: null }

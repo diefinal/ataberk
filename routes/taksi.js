@@ -14,12 +14,99 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /taksi/api/queue -> Proxy queue data (bypass CORS)
+// GET /taksi/api/queue -> Proxy queue data (fallback to bridge data if blocked)
 router.get('/api/queue', async (req, res) => {
   try {
+    // Try to fetch live data directly (works locally on PC)
     const data = await state.fetchQueueData();
-    res.json({ success: true, data });
+    // Update local state just in case
+    state.latestQueueData = data;
+    return res.json({ success: true, data });
   } catch (err) {
+    // If direct fetch fails (e.g. blocked on cloud server), fallback to pushed bridge data
+    if (state.latestQueueData) {
+      return res.json({ success: true, data: state.latestQueueData });
+    }
+    res.status(500).json({ success: false, error: 'Sıra verisi çekilemedi ve kayıtlı yedek veri bulunamadı.' });
+  }
+});
+
+// POST /taksi/api/push-data -> Securely receive queue data from local PC bridge
+router.post('/api/push-data', async (req, res) => {
+  try {
+    const { token, data } = req.body;
+    const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+
+    if (!token || token !== adminPassword) {
+      return res.status(401).json({ success: false, error: 'Yetkisiz erişim: Geçersiz token.' });
+    }
+
+    if (!data || !data.sehirici || !data.sehirdisi) {
+      return res.status(400).json({ success: false, error: 'Geçersiz veri formatı.' });
+    }
+
+    // Update global state
+    state.latestQueueData = data;
+    console.log(`[Taksi Köprü] Yeni veri alındı: Şehiriçi: ${data.sehirici}, Şehirdışı: ${data.sehirdisi}`);
+
+    // Process subscriptions immediately
+    const currentSehirici = parseInt(data.sehirici, 10);
+    const currentSehirdisi = parseInt(data.sehirdisi, 10);
+    const sehiriciDongu = parseInt(data.sehirici_dongu, 10) || 0;
+    const sehirdisiDongu = parseInt(data.sehirdisi_dongu, 10) || 0;
+    
+    const lastState = state.lastSeenState;
+    let hasChanges = false;
+
+    // 1. Şehiriçi Değişim Kontrolü
+    if (!isNaN(currentSehirici) && (lastState.sehirici.number !== currentSehirici || lastState.sehirici.dongu !== sehiriciDongu)) {
+      console.log(`[Taksi Köprü - Şehiriçi] Değişim: ${lastState.sehirici.number || 'Yok'} -> ${currentSehirici}`);
+      lastState.sehirici.number = currentSehirici;
+      lastState.sehirici.dongu = sehiriciDongu;
+      hasChanges = true;
+
+      // Aboneleri tara ve bildir
+      state.activeSubscriptions.forEach(async (sub) => {
+        if (sub.sehiriciEnabled && currentSehirici >= sub.sehiriciRangeStart && currentSehirici <= sub.sehiriciRangeEnd) {
+          if (sub.lastSehiriciVal !== currentSehirici) {
+            sub.lastSehiriciVal = currentSehirici;
+            sub.lastUpdated = Date.now();
+            const msg = `Şehiriçi sırası ${currentSehirici} oldu! (${sub.sehiriciRangeStart}-${sub.sehiriciRangeEnd} aralığı).`;
+            console.log(`[ALARM] [Şehiriçi] Sent to ${sub.ntfyTopic}: ${msg}`);
+            await state.sendPushNotification(sub.ntfyTopic, msg, '🚨 SEHIRICI SIRA UYARISI', 'taxi,warning,rotating_light');
+          }
+        }
+      });
+    }
+
+    // 2. Şehirdışı Değişim Kontrolü
+    if (!isNaN(currentSehirdisi) && (lastState.sehirdisi.number !== currentSehirdisi || lastState.sehirdisi.dongu !== sehirdisiDongu)) {
+      console.log(`[Taksi Köprü - Şehirdışı] Değişim: ${lastState.sehirdisi.number || 'Yok'} -> ${currentSehirdisi}`);
+      lastState.sehirdisi.number = currentSehirdisi;
+      lastState.sehirdisi.dongu = sehirdisiDongu;
+      hasChanges = true;
+
+      // Aboneleri tara ve bildir
+      state.activeSubscriptions.forEach(async (sub) => {
+        if (sub.sehirdisiEnabled && currentSehirdisi >= sub.sehirdisiRangeStart && currentSehirdisi <= sub.sehirdisiRangeEnd) {
+          if (sub.lastSehirdisiVal !== currentSehirdisi) {
+            sub.lastSehirdisiVal = currentSehirdisi;
+            sub.lastUpdated = Date.now();
+            const msg = `Şehirdışı sırası ${currentSehirdisi} oldu! (${sub.sehirdisiRangeStart}-${sub.sehirdisiRangeEnd} aralığı).`;
+            console.log(`[ALARM] [Şehirdışı] Sent to ${sub.ntfyTopic}: ${msg}`);
+            await state.sendPushNotification(sub.ntfyTopic, msg, '🚨 SEHIRDISI SIRA UYARISI', 'taxi,warning,bullettrain_side');
+          }
+        }
+      });
+    }
+
+    if (hasChanges) {
+      state.saveSubscriptions();
+    }
+
+    res.json({ success: true, message: 'Veri başarıyla işlendi.' });
+  } catch (err) {
+    console.error('[Taksi Köprü] Hata:', err.message);
     res.status(500).json({ success: false, error: err.message });
   }
 });

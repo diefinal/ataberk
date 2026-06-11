@@ -152,7 +152,11 @@ initDb().then(() => {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`Adres: http://localhost:${PORT}`);
-    startTaksiMonitor(); // Taksi takip motorunu başlat
+    if (!process.env.RENDER) {
+      startTaksiMonitor(); // Taksi takip motorunu başlat (Sadece yerelde çalışır)
+    } else {
+      console.log('Canlı sunucu (Render) modunda: Canlı takip verileri yerel PC köprüsünden (push-data) alınacaktır.');
+    }
   });
 }).catch(err => {
   console.error('DB başlatma hatası:', err);
