@@ -1,4 +1,8 @@
-require('dotenv').config();
+try {
+  require('dotenv').config();
+} catch (err) {
+  // dotenv not installed on external PC, will use default configuration fallback values
+}
 const fs = require('fs');
 const path = require('path');
 
