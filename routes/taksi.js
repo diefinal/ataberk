@@ -98,7 +98,7 @@ router.post('/api/test-push', async (req, res) => {
     }
 
     const testMsg = `Deneme Bildirimi: Telefon bağlantınız başarıyla kuruldu! Sıra takip uyarısı bu kanaldan gelecektir.`;
-    await state.sendPushNotification(topic, testMsg, '🔔 Test Bildirimi', 'white_check_mark,tada');
+    await state.sendPushNotification(topic, testMsg, '🔔 Test Uyarisi', 'white_check_mark,tada');
     
     res.json({ success: true, message: 'Test bildirimi telefona gönderildi!' });
   } catch (err) {

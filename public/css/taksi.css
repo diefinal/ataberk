@@ -758,3 +758,25 @@
 .taksi-page-wrapper .log-entry.success {
   color: var(--taksi-success);
 }
+
+.taksi-page-wrapper .cloud-warning-box {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: var(--taksi-radius-md);
+  color: #fca5a5;
+  padding: 15px 20px;
+  margin-bottom: 25px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.taksi-page-wrapper .cloud-warning-box i {
+  font-size: 24px;
+  color: var(--taksi-danger);
+  flex-shrink: 0;
+}
+

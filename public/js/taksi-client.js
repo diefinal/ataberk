@@ -53,6 +53,18 @@ function getClientConfig() {
 
 // Initialize App
 async function init() {
+  // Show warning if running on a public server (not localhost/local IP)
+  const isLocal = window.location.hostname === 'localhost' || 
+                  window.location.hostname === '127.0.0.1' || 
+                  window.location.hostname.startsWith('192.168.') ||
+                  window.location.hostname.startsWith('10.') ||
+                  window.location.hostname.startsWith('172.');
+                  
+  const cloudWarning = document.getElementById('cloudWarning');
+  if (!isLocal && cloudWarning) {
+    cloudWarning.style.display = 'flex';
+  }
+
   // 1. Generate or load persistent Client ID
   clientId = localStorage.getItem('taksi_client_id');
   if (!clientId) {

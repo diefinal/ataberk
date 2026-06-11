@@ -16,7 +16,7 @@ if (fs.existsSync(SUBS_FILE)) {
 
 function saveSubscriptions() {
   try {
-    fs.writeFileSync(SUBS_FILE, JSON.stringify(activeSubscriptions, null, 2), 'utf-8');
+    fs.writeFileSync(SUBS_FILE, JSON.stringify(module.exports.activeSubscriptions, null, 2), 'utf-8');
   } catch (err) {
     console.error('Error saving subscriptions:', err.message);
   }
@@ -26,8 +26,7 @@ function saveSubscriptions() {
 function cleanExpiredSubscriptions() {
   const now = Date.now();
   const twelveHours = 12 * 60 * 60 * 1000;
-  const initialCount = activeSubscriptions.length;
-  // Use module.exports reference to ensure we update the array exported
+  const initialCount = module.exports.activeSubscriptions.length;
   module.exports.activeSubscriptions = module.exports.activeSubscriptions.filter(sub => (now - sub.lastUpdated) < twelveHours);
   if (module.exports.activeSubscriptions.length !== initialCount) {
     console.log(`Cleaned up ${initialCount - module.exports.activeSubscriptions.length} expired taxi subscriptions.`);
@@ -52,7 +51,7 @@ async function fetchQueueData() {
   return await res.json();
 }
 
-async function sendPushNotification(topic, message, title = 'Taksi Sıra Takip', tags = 'taxi,warning') {
+async function sendPushNotification(topic, message, title = 'Taksi Sira Takip', tags = 'taxi,warning') {
   if (!topic || topic.trim() === '') return;
   const url = `https://ntfy.sh/${topic.trim()}`;
   try {
@@ -60,7 +59,7 @@ async function sendPushNotification(topic, message, title = 'Taksi Sıra Takip',
       method: 'POST',
       body: message,
       headers: {
-        'Title': encodeURIComponent(title),
+        'Title': title,
         'Priority': '5',
         'Tags': tags,
         'Click': 'https://www.antalyaairporttaxi.net/sira/',

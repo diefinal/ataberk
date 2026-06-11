@@ -104,7 +104,7 @@ async function startTaksiMonitor() {
               sub.lastUpdated = Date.now();
               const msg = `Şehiriçi sırası ${currentSehirici} oldu! (${sub.sehiriciRangeStart}-${sub.sehiriciRangeEnd} aralığı).`;
               console.log(`[ALARM] [Şehiriçi] Sent to ${sub.ntfyTopic}: ${msg}`);
-              await taksiState.sendPushNotification(sub.ntfyTopic, msg, '🚨 ŞEHİRİÇİ SIRA UYARISI', 'taxi,warning,rotating_light');
+              await taksiState.sendPushNotification(sub.ntfyTopic, msg, '🚨 SEHIRICI SIRA UYARISI', 'taxi,warning,rotating_light');
             }
           }
         });
@@ -125,7 +125,7 @@ async function startTaksiMonitor() {
               sub.lastUpdated = Date.now();
               const msg = `Şehirdışı sırası ${currentSehirdisi} oldu! (${sub.sehirdisiRangeStart}-${sub.sehirdisiRangeEnd} aralığı).`;
               console.log(`[ALARM] [Şehirdışı] Sent to ${sub.ntfyTopic}: ${msg}`);
-              await taksiState.sendPushNotification(sub.ntfyTopic, msg, '🚨 ŞEHİRDIŞI SIRA UYARISI', 'taxi,warning,bullettrain_side');
+              await taksiState.sendPushNotification(sub.ntfyTopic, msg, '🚨 SEHIRDISI SIRA UYARISI', 'taxi,warning,bullettrain_side');
             }
           }
         });
