@@ -51,15 +51,16 @@ async function fetchQueueData() {
   return await res.json();
 }
 
-async function sendPushNotification(topic, message, title = 'Taksi Sira Takip', tags = 'taxi,warning') {
+async function sendPushNotification(topic, message, title = 'Taksi Sıra Takip', tags = 'taxi,warning') {
   if (!topic || topic.trim() === '') return;
   const url = `https://ntfy.sh/${topic.trim()}`;
+  const encodedTitle = '=?utf-8?B?' + Buffer.from(title).toString('base64') + '?=';
   try {
     const res = await fetch(url, {
       method: 'POST',
       body: message,
       headers: {
-        'Title': title,
+        'Title': encodedTitle,
         'Priority': '5',
         'Tags': tags,
         'Click': 'https://www.antalyaairporttaxi.net/sira/',
