@@ -69,6 +69,8 @@ input[name="code"]{letter-spacing:8px;font-size:1.4rem;text-align:center;font-we
 .dancing{animation:dance 0.4s ease infinite !important;}
 .jumping{animation:jumpUp 0.5s ease !important;}
 @media(max-width:900px){.container{grid-template-columns:1fr;height:auto;}.left{min-height:280px;}.right{padding:30px 24px 40px;}}
+@keyframes shake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-8px);}40%,80%{transform:translateX(8px);}}
+.shake{animation:shake 0.4s ease;}
 </style>
 </head>
 <body>
@@ -122,18 +124,49 @@ input[name="code"]{letter-spacing:8px;font-size:1.4rem;text-align:center;font-we
     <div class="form-box" id="formBox">
       <div class="logo">🐧</div>
       <h1>Hoş Geldin, Ataberk!</h1>
-
-      <% if (step === 'email') { %>
-      <div class="subtitle">Siteye erişmek için e-posta adresini gir</div>
-      <% if (error) { %><div class="message error-msg"><%= error %></div><% } %>
-      <form method="POST" action="/giris" id="loginForm">
-        <div class="input-group">
-          <label>E-posta Adresi</label>
-          <input type="email" name="email" id="emailInput" placeholder="ornek@mail.com" required autofocus>
+      <div id="visualLoginSection" <% if (error || (typeof step !== 'undefined' && step === 'code')) { %>style="display: none;"<% } %>>
+        <div class="subtitle" style="margin-bottom: 12px;">Giriş yapmak için görseldeki 3 gizli noktaya tıklayın.</div>
+        
+        <div class="visual-img-container" style="position: relative; width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.15); cursor: crosshair; border: 2px solid #eee; transition: border-color 0.2s;">
+          <img id="visualLoginImg" src="/images/visual_login.jpg" alt="Visual Login" style="width: 100%; display: block; -webkit-user-drag: none; user-select: none;">
+          <div id="clickIndicators"></div>
         </div>
-        <button class="login-btn" type="submit" id="submitBtn">Kod Gönder →</button>
-        <div class="message" id="message"></div>
-      </form>
+
+        <div style="margin-top: 14px; display: flex; justify-content: space-between; align-items: center;">
+          <button id="resetVisualBtn" class="login-btn" style="width: auto; padding: 8px 18px; font-size: 13px; height: auto; margin: 0; border-radius: 6px;">Temizle</button>
+          <div id="visualStatus" style="font-size: 13px; font-weight: 700; color: #666;">0 / 3 Tıklama</div>
+        </div>
+
+        <div id="visualError" class="message error-msg" style="min-height: 20px; margin-top: 10px;"></div>
+      </div>
+
+      <div id="emailLoginSection" <% if (!error && (typeof step !== 'undefined' && step !== 'code')) { %>style="display: none;"<% } %>>
+        <% if (step === 'email') { %>
+        <div class="subtitle">Siteye erişmek için e-posta adresini gir</div>
+        <% if (error) { %><div class="message error-msg"><%= error %></div><% } %>
+        <form method="POST" action="/giris" id="loginForm">
+          <div class="input-group">
+            <label>E-posta Adresi</label>
+            <input type="email" name="email" id="emailInput" placeholder="ornek@mail.com" required autofocus>
+          </div>
+          <button class="login-btn" type="submit" id="submitBtn">Kod Gönder →</button>
+          <div class="message" id="message"></div>
+        </form>
+        <% } else { %>
+        <div class="subtitle">E-postana 6 haneli kod gönderdik</div>
+        <% if (error) { %><div class="message error-msg"><%= error %></div><% } %>
+        <form method="POST" action="/dogrula" id="loginForm">
+          <div class="input-group">
+            <label>Doğrulama Kodu</label>
+            <input type="text" name="code" placeholder="• • • • • •" maxlength="6" required autofocus>
+          </div>
+          <button class="login-btn" type="submit" id="submitBtn">Giriş Yap →</button>
+          <div class="message" id="message"></div>
+        </form>
+        <a href="/giris" class="back-link">← Farklı e-posta kullan</a>
+        <% } %>
+      </div>
+
       <div style="margin-top: 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; border-top: 1px solid #eee; padding-top: 20px;">
         <div style="display: flex; gap: 16px; justify-content: center; width: 100%; flex-wrap: wrap;">
           <a href="/haberler" style="color: #6f3cff; font-weight: 700; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 4px;">📰 Haberler</a>
@@ -145,19 +178,11 @@ input[name="code"]{letter-spacing:8px;font-size:1.4rem;text-align:center;font-we
         <a href="/admin/giris" class="admin-link" style="margin-top: 4px;">🔐 Admin girişi</a>
       </div>
 
-      <% } else { %>
-      <div class="subtitle">E-postana 6 haneli kod gönderdik</div>
-      <% if (error) { %><div class="message error-msg"><%= error %></div><% } %>
-      <form method="POST" action="/dogrula" id="loginForm">
-        <div class="input-group">
-          <label>Doğrulama Kodu</label>
-          <input type="text" name="code" placeholder="• • • • • •" maxlength="6" required autofocus>
-        </div>
-        <button class="login-btn" type="submit" id="submitBtn">Giriş Yap →</button>
-        <div class="message" id="message"></div>
-      </form>
-      <a href="/giris" class="back-link">← Farklı e-posta kullan</a>
-      <% } %>
+      <div id="debugPanel" style="display: none; margin-top: 16px; padding: 10px; background: #f9f9f9; border: 1px dashed #6f3cff; border-radius: 6px; font-family: monospace; font-size: 12px; color: #333; width: 100%; text-align: left;">
+        <strong style="color: #6f3cff;">Geliştirici Modu (Debug):</strong><br>
+        Son Tıklama: <span id="debugCoords">X: -% , Y: -%</span><br>
+        <span style="font-size: 10px; color: #888;">Görsellere tıklayarak koordinatları bulun.</span>
+      </div>
     </div>
   </div>
 </div>
@@ -381,6 +406,146 @@ function drawIF(){
     if(f.x>ic.width)f.x=0;if(f.x<0)f.x=ic.width;
   });
   requestAnimationFrame(drawIF);
+}
+// --- GÖRSEL GİRİŞ SİSTEMİ (VISUAL CLICK LOGIN) ---
+const isDebug = new URLSearchParams(window.location.search).has('debug');
+if (isDebug) {
+  document.getElementById('debugPanel').style.display = 'block';
+}
+
+// Sol panel penguen tıklama (gizli e-posta tetikleyicisi)
+const charImgSec = document.getElementById('charImg');
+if (charImgSec) {
+  const charImgEl = charImgSec.querySelector('img');
+  
+  // Penguen gizli nokta koordinatları (örn: gaga civarı %50, %55)
+  const SECRET_CHAR_SPOT = { x: 50.0, y: 55.0 };
+  const CHAR_TOLERANCE = 12.0; // %12 esneklik payı
+  
+  charImgSec.addEventListener('click', function(e) {
+    if (!charImgEl) return;
+    const rect = charImgEl.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    
+    if (isDebug) {
+      document.getElementById('debugCoords').textContent = `Penguen: X: ${x.toFixed(1)}%, Y: ${y.toFixed(1)}%`;
+      console.log(`Penguen Tıklama: X: ${x.toFixed(1)}%, Y: ${y.toFixed(1)}%`);
+    }
+    
+    // Gizli nokta mesafesi hesapla
+    const dist = Math.sqrt(Math.pow(x - SECRET_CHAR_SPOT.x, 2) + Math.pow(y - SECRET_CHAR_SPOT.y, 2));
+    if (dist <= CHAR_TOLERANCE) {
+      // Doğru yere tıklandı: E-posta giriş alanını göster, görsel alanı gizle
+      document.getElementById('visualLoginSection').style.display = 'none';
+      document.getElementById('emailLoginSection').style.display = 'block';
+      danceChars();
+      bubble('Gizli kapı açıldı! 🔑', e.clientX, e.clientY - 20);
+    }
+  });
+}
+
+// Sağ panel görsel tıklama (Ana giriş sistemi)
+const visualLoginImg = document.getElementById('visualLoginImg');
+const clickIndicators = document.getElementById('clickIndicators');
+const visualStatus = document.getElementById('visualStatus');
+const visualError = document.getElementById('visualError');
+const resetVisualBtn = document.getElementById('resetVisualBtn');
+
+let clicks = [];
+
+if (visualLoginImg) {
+  visualLoginImg.addEventListener('click', function(e) {
+    if (clicks.length >= 3) return; // Zaten 3 tıklama yapılmış, bekle
+    
+    const rect = visualLoginImg.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    
+    clicks.push({ x, y });
+    
+    if (isDebug) {
+      document.getElementById('debugCoords').textContent = `Görsel: X: ${x.toFixed(1)}%, Y: ${y.toFixed(1)}%`;
+      console.log(`Görsel Tıklama #${clicks.length}: X: ${x.toFixed(1)}%, Y: ${y.toFixed(1)}%`);
+    }
+    
+    // İşaretçi ekle
+    const dot = document.createElement('div');
+    dot.className = 'click-dot';
+    dot.style.cssText = `
+      position: absolute;
+      left: ${x}%;
+      top: ${y}%;
+      width: 18px;
+      height: 18px;
+      background: #6f3cff;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 10px rgba(111,60,255,0.8);
+      pointer-events: none;
+      z-index: 10;
+      color: #fff;
+      font-size: 10px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    `;
+    dot.textContent = clicks.length;
+    
+    clickIndicators.appendChild(dot);
+    
+    visualStatus.textContent = `${clicks.length} / 3 Tıklama`;
+    
+    if (clicks.length === 3) {
+      visualStatus.textContent = 'Doğrulanıyor...';
+      
+      fetch('/giris/gorsel-giris', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clicks: clicks })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          celebrateChars();
+          visualStatus.textContent = 'Giriş Başarılı!';
+          visualStatus.style.color = '#2a9d8f';
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 800);
+        } else {
+          const container = document.querySelector('.visual-img-container');
+          container.classList.add('shake');
+          visualError.textContent = data.message;
+          fightChars();
+          
+          setTimeout(() => {
+            container.classList.remove('shake');
+            resetClicks();
+          }, 1200);
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        visualError.textContent = 'Bağlantı hatası oluştu.';
+        resetClicks();
+      });
+    }
+  });
+}
+
+function resetClicks() {
+  clicks = [];
+  clickIndicators.innerHTML = '';
+  visualStatus.textContent = '0 / 3 Tıklama';
+  visualStatus.style.color = '';
+  visualError.textContent = '';
+}
+
+if (resetVisualBtn) {
+  resetVisualBtn.addEventListener('click', resetClicks);
 }
 drawIF();
 </script>
