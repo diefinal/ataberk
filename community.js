@@ -423,7 +423,7 @@ const voiceUpload = multer({
   limits: { fileSize: 6 * 1024 * 1024, files: 1, fields: 2, parts: 3 },
 }).single("audio");
 router.post(
-  "/medya/:id/ses",
+  "/aile-medya/:id/ses",
   requireUser,
   (req, res, next) => {
     const size = Number(req.get("content-length"));
@@ -456,7 +456,7 @@ router.post(
       await storage.rollback("voice-notes", k, "audio/wav");
       throw e;
     }
-    res.redirect("/medya/" + media.id);
+    res.redirect("/aile-medya/" + media.id);
   }),
 );
 router.get(
@@ -497,7 +497,7 @@ router.post(
       v.id,
     ]);
     await audit(req.user, "voice.soft_delete", v.id);
-    res.redirect("/medya/" + v.media_id);
+    res.redirect("/aile-medya/" + v.media_id);
   }),
 );
 router.get(
@@ -522,7 +522,7 @@ router.get(
   }),
 );
 router.get(
-  "/medya/:id/konum",
+  "/aile-medya/:id/konum",
   requireAdmin,
   wrap(async (req, res) => {
     const media = await mediaAccess(req.user, id(req.params.id));
@@ -541,7 +541,7 @@ router.get(
   }),
 );
 router.post(
-  "/medya/:id/konum",
+  "/aile-medya/:id/konum",
   requireAdmin,
   wrap(async (req, res) => {
     const media = await mediaAccess(req.user, id(req.params.id));

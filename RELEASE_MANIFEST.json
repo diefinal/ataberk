@@ -21,8 +21,8 @@
   },
   {
     "path": "server.js",
-    "bytes": 5178,
-    "sha256": "34ae960ed560569542514a4e3cf28359f6413dcb701c6dbfbd924f1ad822daae"
+    "bytes": 5543,
+    "sha256": "7587bb2c12a8a9eb3c1751617bd779ebf6ab80a58869b272f6fe5a2fe05ae60c"
   },
   {
     "path": "db.js",
@@ -46,23 +46,23 @@
   },
   {
     "path": "family.js",
-    "bytes": 25719,
-    "sha256": "a7c99e7ad8affe018b15fe586f583b3028396eb90637034f3e094a650a970950"
+    "bytes": 25754,
+    "sha256": "3cbe2a627f38e4bab1b2890a2312f8ef94f65afc80baae3663c0232611a32e2a"
   },
   {
     "path": "enhancements.js",
-    "bytes": 8200,
-    "sha256": "6e0a25eb09e0ca6ef233744c52ca8f610c2bd6c1da1a56bf3faa3f4d59ea2999"
+    "bytes": 8210,
+    "sha256": "a299bb4cf9dccad6e74ddd9ce4b315648f76a8b0787ec2cae84be3c5efad761c"
   },
   {
     "path": "experiences.js",
-    "bytes": 18186,
-    "sha256": "b6252ee4f19e1a11be29fec5d6937992f1797f8bec90ae2d26e161443878e930"
+    "bytes": 18206,
+    "sha256": "bc09d393cb907435c08ef444be206c672941e1c00997aa86c7b92adba25ad28e"
   },
   {
     "path": "community.js",
-    "bytes": 25306,
-    "sha256": "07ed89f5727113f34d6e29631343b48b756dd56c61ad2a68f33096d09ecacbd8"
+    "bytes": 25331,
+    "sha256": "4f1ce46909270aedc0d4ce2822586d82dcff2b971beb487288f4d3c6409ec8b5"
   },
   {
     "path": "mailer.js",
@@ -73,6 +73,11 @@
     "path": "photo-book.js",
     "bytes": 3705,
     "sha256": "670cbaf83fa3476751d5ad245d2dde2d3a0bbd7326be50508d962f2a7af7048d"
+  },
+  {
+    "path": "legacy.js",
+    "bytes": 1262,
+    "sha256": "835e3fef313dbd42c35feca53b879d7f54efd7c2cf7f97d374de560e14a4bc19"
   },
   {
     "path": "scripts/migrate.js",
@@ -236,13 +241,13 @@
   },
   {
     "path": "public/js/family.js",
-    "bytes": 2595,
-    "sha256": "10021798d163f35c36edccd956707819dfb3acd4804693ac92d31f0354c4caa6"
+    "bytes": 2600,
+    "sha256": "c89635dc574661a560d23b9688deb2b3232e72551b96c1daa29392ab41a46ab3"
   },
   {
     "path": "public/js/gallery.js",
-    "bytes": 2969,
-    "sha256": "3be33f7d8be42608b4b7a55e4f13748c2366ab99bea4a18359711215378ae2c7"
+    "bytes": 2974,
+    "sha256": "228bc8227c80da38880c1dd1807027c1d6d8f3ccedc32f0297d7a8bee5a36637"
   },
   {
     "path": "public/js/lightbox.js",
@@ -276,8 +281,8 @@
   },
   {
     "path": "public/js/voice-notes.js",
-    "bytes": 5612,
-    "sha256": "8e62a23dbd20a1242410783e1f9d09b750b0bb23bbd8e5d445584d5d909c69f9"
+    "bytes": 5622,
+    "sha256": "3f192296891f20afc7784660980c709663f773e1dff7821217f00ee48e9e7abc"
   },
   {
     "path": "public/js/voice-processor.js",
@@ -341,8 +346,8 @@
   },
   {
     "path": "views/family/admin.ejs",
-    "bytes": 9020,
-    "sha256": "5f8870d5937d992bcf8e6ec8293ff6858da8ce364aeaa2c7801bf3266f2caf94"
+    "bytes": 9025,
+    "sha256": "316e70a6a2c1c34ddbcbf7bf39e981e6a7b50a4f4f01d4c181295c61dbd64edd"
   },
   {
     "path": "views/family/album-grid.ejs",
@@ -381,8 +386,8 @@
   },
   {
     "path": "views/family/cards.ejs",
-    "bytes": 1138,
-    "sha256": "60133639b8c15d46e89879e81531c76ee886742274e6fb33e3a7b8dcf2d17b7d"
+    "bytes": 1143,
+    "sha256": "9d30465fd05cf3e20a32a70792c31057918dc311de0d7f2562174efa649c414c"
   },
   {
     "path": "views/family/challenge.ejs",
@@ -431,8 +436,8 @@
   },
   {
     "path": "views/family/home.ejs",
-    "bytes": 10079,
-    "sha256": "0c6d855c6002d14ba543cad5e6f9ec0c52bf85780570e881551e139d098bb6dd"
+    "bytes": 10080,
+    "sha256": "abbe72df7947ae726f2e7608a45944e26cc456043bc8045386b8f036182d7d4c"
   },
   {
     "path": "views/family/install.ejs",
@@ -461,8 +466,8 @@
   },
   {
     "path": "views/family/media.ejs",
-    "bytes": 3182,
-    "sha256": "e6d6b24734999c3ec989360d18f594f33774770fa106b248ccfafb3bdd08054f"
+    "bytes": 3212,
+    "sha256": "677bdb8622815b8ff31d0d66f1b0c6b32288e86fdab263176b1d2de09765f52c"
   },
   {
     "path": "views/family/members.ejs",
@@ -496,8 +501,8 @@
   },
   {
     "path": "views/family/place-edit.ejs",
-    "bytes": 908,
-    "sha256": "373838b4b73313ad145c9ea88005809fc49159ce2c6b2ecbb085e54cac18994d"
+    "bytes": 913,
+    "sha256": "ee7b0aac7c08d0b2b6eab0e03353b7d02dd6f63af2ae2acfe6a98ab03d7ada34"
   },
   {
     "path": "views/family/profile.ejs",
@@ -516,8 +521,8 @@
   },
   {
     "path": "views/family/story-edit.ejs",
-    "bytes": 1317,
-    "sha256": "6d2fac0319d9733d298e446d68c49b56de2a04698496e1591e64a80c66311abe"
+    "bytes": 1322,
+    "sha256": "37447ca4b0c51acce17017afdd82f0325573d72b9dbbdbfa07ad6e92d7207299"
   },
   {
     "path": "views/family/timeline.ejs",
@@ -591,8 +596,8 @@
   },
   {
     "path": "views/partials/footer.ejs",
-    "bytes": 1531,
-    "sha256": "895857c91ff43dc2af23ae5cda1730dc66de44c05bc5c93ce9e6da4d3a429f96"
+    "bytes": 1600,
+    "sha256": "cca7deff0023d7336da420aea8af695b95b30441368a1cf2774957a9bacac830"
   },
   {
     "path": "views/partials/header.ejs",

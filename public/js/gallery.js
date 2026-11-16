@@ -43,7 +43,7 @@
     counter.textContent = `${index + 1} / ${triggers.length}`;
     prev.disabled = next.disabled = triggers.length === 1;
     zoom.hidden = source.type === "video";
-    dialog.querySelector(".gallery-detail").href = "/medya/" + source.id;
+    dialog.querySelector(".gallery-detail").href = "/aile-medya/" + source.id;
   }
   triggers.forEach((button, i) =>
     button.addEventListener("click", () => {

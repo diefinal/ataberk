@@ -40,7 +40,7 @@ document.querySelectorAll("[data-upload]").forEach((form) =>
 );
 document.querySelectorAll("[data-reactions]").forEach(async (el) => {
   try {
-    const response = await fetch("/api/reaksiyon/" + el.dataset.reactions);
+    const response = await fetch("/aile-api/reaksiyon/" + el.dataset.reactions);
     if (!response.ok) return;
     const data = await response.json();
     el.textContent =

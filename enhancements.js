@@ -114,7 +114,7 @@ router.get(
   }),
 );
 router.post(
-  "/api/favori/:id",
+  "/aile-api/favori/:id",
   requireUser,
   wrap(async (req, res) => {
     const media = await mediaAccess(req.user, id(req.params.id));
@@ -142,7 +142,7 @@ router.post(
     } finally {
       c.release();
     }
-    res.redirect("/medya/" + media.id);
+    res.redirect("/aile-medya/" + media.id);
   }),
 );
 router.get(

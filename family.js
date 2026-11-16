@@ -124,7 +124,7 @@ router.get(
   }),
 );
 router.get(
-  "/medya/:id",
+  "/aile-medya/:id",
   requireUser,
   wrap(async (req, res) => {
     const media = await mediaAccess(req.user, id(req.params.id));
@@ -185,11 +185,11 @@ router.get(
   wrap((req, res) => deliver(req, res)),
 );
 router.get(
-  "/api/indir/:id",
+  "/aile-api/indir/:id",
   wrap((req, res) => deliver(req, res, true)),
 );
 router.post(
-  "/api/yorum/:id",
+  "/aile-api/yorum/:id",
   requireUser,
   wrap(async (req, res) => {
     const media = await mediaAccess(req.user, id(req.params.id));
@@ -200,11 +200,11 @@ router.post(
       "INSERT INTO comments(media_id,user_id,content) VALUES($1,$2,$3)",
       [media.id, req.user.id, content],
     );
-    res.redirect("/medya/" + media.id);
+    res.redirect("/aile-medya/" + media.id);
   }),
 );
 router.get(
-  "/api/reaksiyon/:id",
+  "/aile-api/reaksiyon/:id",
   requireUser,
   wrap(async (req, res) => {
     if (!(await mediaAccess(req.user, id(req.params.id))))
@@ -228,7 +228,7 @@ router.get(
   }),
 );
 router.post(
-  "/api/reaksiyon/:id",
+  "/aile-api/reaksiyon/:id",
   requireUser,
   wrap(async (req, res) => {
     const media = await mediaAccess(req.user, id(req.params.id)),
@@ -265,7 +265,7 @@ router.post(
     } finally {
       c.release();
     }
-    res.redirect("/medya/" + media.id);
+    res.redirect("/aile-medya/" + media.id);
   }),
 );
 router.get(

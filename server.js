@@ -40,6 +40,21 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.static(path.join(__dirname, "public"), { index: false }));
+if (config.production) app.use(require("./legacy").createLegacyRouter());
+else {
+  app.use("/medya", (req, res) =>
+    res.redirect(
+      307,
+      req.originalUrl.replace(/^\/medya(?=\/|\?|$)/, "/aile-medya"),
+    ),
+  );
+  app.use("/api", (req, res) =>
+    res.redirect(
+      307,
+      req.originalUrl.replace(/^\/api(?=\/|\?|$)/, "/aile-api"),
+    ),
+  );
+}
 app.use(express.urlencoded({ extended: false, limit: "32kb" }));
 app.use(express.json({ limit: "32kb" }));
 app.use((req, res, next) => {

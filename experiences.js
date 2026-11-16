@@ -113,7 +113,7 @@ router.post(
   }),
 );
 router.post(
-  "/api/tema",
+  "/aile-api/tema",
   requireUser,
   wrap(async (req, res) => {
     if (!["system", "light", "dark"].includes(req.body.theme))
@@ -331,7 +331,7 @@ router.post(
   }),
 );
 router.get(
-  "/medya/:id/hikaye",
+  "/aile-medya/:id/hikaye",
   requireAdmin,
   wrap(async (req, res) => {
     const media = await mediaAccess(req.user, id(req.params.id));
@@ -358,7 +358,7 @@ router.get(
   }),
 );
 router.post(
-  "/medya/:id/hikaye",
+  "/aile-medya/:id/hikaye",
   requireAdmin,
   wrap(async (req, res) => {
     const media = await mediaAccess(req.user, id(req.params.id));
@@ -408,7 +408,7 @@ router.post(
     } finally {
       c.release();
     }
-    res.redirect("/medya/" + media.id);
+    res.redirect("/aile-medya/" + media.id);
   }),
 );
 router.get(

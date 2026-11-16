@@ -152,7 +152,7 @@
     form.set("audio", blob, "aile-sesli-ani.wav");
     form.set("caption", document.getElementById("voice-caption").value);
     try {
-      const r = await fetch("/medya/" + root.dataset.mediaId + "/ses", {
+      const r = await fetch("/aile-medya/" + root.dataset.mediaId + "/ses", {
         method: "POST",
         headers: {
           "x-csrf-token": document.querySelector("[name=csrf-token]").content,
@@ -160,7 +160,7 @@
         body: form,
       });
       if (!r.ok) throw Error();
-      location.assign("/medya/" + root.dataset.mediaId);
+      location.assign("/aile-medya/" + root.dataset.mediaId);
     } catch {
       upload.disabled = false;
       status.textContent =
