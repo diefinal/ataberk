@@ -1,6 +1,10 @@
 node_modules/
-uploads/
-data.db
 .env
-taksi-sira-takip/
-taksi-subscriptions.json
+.env.*
+!.env.example
+.runtime/
+.npm-cache/
+test-results/
+.release/
+uploads/
+*.log

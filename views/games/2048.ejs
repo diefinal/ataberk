@@ -75,6 +75,7 @@ function move(dir){
 function start(){grid=newGrid();score=0;addRandom(grid);addRandom(grid);render();}
 document.getElementById('newGame').addEventListener('click',start);
 document.addEventListener('keydown',e=>{
+  if(e.key.startsWith('Arrow'))e.preventDefault();
   if(e.key==='ArrowLeft')move('left');
   else if(e.key==='ArrowRight')move('right');
   else if(e.key==='ArrowUp')move('up');

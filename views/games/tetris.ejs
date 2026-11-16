@@ -38,7 +38,7 @@ const PIECES=[
   [[0,7,7],[7,7,0]]
 ];
 
-let board, piece, pos, score, level, lines, running=false, interval;
+let board=newBoard(), piece, pos, score, level, lines, running=false, interval;
 
 function newBoard(){return Array(H).fill(null).map(()=>Array(W).fill(0));}
 function randPiece(){const p=PIECES[Math.floor(Math.random()*PIECES.length)];return{shape:p,color:p[0].find(v=>v)};}
@@ -96,6 +96,7 @@ function rotate(shape){return shape[0].map((_,i)=>shape.map(r=>r[i]).reverse());
 
 document.addEventListener('keydown',e=>{
   if(!running)return;
+  if(['ArrowLeft','ArrowRight','ArrowDown','ArrowUp',' '].includes(e.key))e.preventDefault();
   if(e.key==='ArrowLeft'&&validPos(piece.shape,pos.x-1,pos.y))pos.x--;
   else if(e.key==='ArrowRight'&&validPos(piece.shape,pos.x+1,pos.y))pos.x++;
   else if(e.key==='ArrowDown'&&validPos(piece.shape,pos.x,pos.y+1))pos.y++;

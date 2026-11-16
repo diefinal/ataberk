@@ -1,0 +1,2 @@
+DROP TABLE challenge_attempts,challenge_questions,challenge_votes,challenge_entries,challenges,media_places,voice_notes,family_links,calendar_events;
+ALTER TABLE users DROP COLUMN tree_visible,DROP COLUMN password_hash;

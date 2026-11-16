@@ -1,0 +1,728 @@
+:root {
+  --season-tint: #efa9a0;
+}
+html[data-season="summer"] {
+  --season-tint: #f3d68a;
+}
+html[data-season="winter"] {
+  --season-tint: #a9cbe4;
+}
+html[data-season="spring"] {
+  --season-tint: #b9d8bc;
+}
+.home-edition {
+  border-top: 3px solid var(--season-tint);
+}
+.theme-toggle {
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  font-size: 20px;
+  width: 35px;
+  height: 35px;
+  flex-shrink: 0;
+  padding: 0;
+}
+.profile-entry {
+  font-size: 25px;
+}
+.profile-avatar {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 25px;
+}
+.avatar {
+  object-fit: cover;
+}
+.people-picker {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 17px;
+  margin-bottom: 22px;
+}
+.people-picker legend {
+  font-size: 12px;
+}
+.people-picker label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 7px 15px 7px 0;
+  font-size: 12px;
+}
+.people-picker input {
+  width: auto;
+  margin: 0;
+}
+.photo-story {
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 18px 0;
+  margin: 20px 0;
+}
+.photo-story p {
+  font-size: 12px;
+  margin-bottom: 9px;
+}
+.photo-story strong {
+  font-size: 10px;
+  margin-right: 8px;
+}
+.detail-fullscreen {
+  margin-bottom: 24px;
+}
+.gallery-open {
+  width: calc(100% - 30px);
+  margin: 0 15px 15px;
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 7px 10px;
+  font-size: 11px;
+}
+.family-media-card > a {
+  display: block;
+}
+.gallery-dialog {
+  width: 100vw;
+  height: 100dvh;
+  max-width: 100vw;
+  max-height: 100dvh;
+  border: 0;
+  padding: 20px 28px;
+  background: #172623;
+  color: #fff;
+  position: fixed;
+  inset: 0;
+  margin: 0;
+}
+.gallery-dialog::backdrop {
+  background: #000d;
+}
+.gallery-dialog[open] {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 15px;
+}
+.gallery-top,
+.gallery-bottom {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: space-between;
+}
+.gallery-top button,
+.gallery-bottom button {
+  border: 1px solid #cfe1d255;
+  border-radius: 25px;
+  padding: 8px 17px;
+  background: transparent;
+  color: white;
+  font-size: 13px;
+}
+.gallery-title {
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+.gallery-counter,
+.gallery-detail {
+  font-size: 12px;
+}
+.gallery-stage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: auto;
+  min-height: 0;
+  touch-action: pan-y;
+}
+.gallery-stage > img,
+.gallery-stage > video {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+.gallery-stage.zoomed {
+  display: block;
+  touch-action: auto;
+}
+.gallery-stage.zoomed img {
+  max-width: none;
+  max-height: none;
+  width: 150%;
+  height: auto;
+  margin: auto;
+}
+.submission-preview {
+  width: 100%;
+  height: 230px;
+  object-fit: contain;
+  border-radius: 12px;
+  background: #e8eadf;
+  margin: 20px 0;
+}
+.capsule-card > h2 {
+  font-size: 29px;
+  margin-top: 25px;
+}
+.capsule-card > .button {
+  display: flex;
+  margin-top: 20px;
+}
+.opened-letter {
+  background: #fffdf8;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 45px;
+  margin-top: 30px;
+}
+.opened-letter h1 {
+  font-size: 35px;
+}
+.letter-body {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: italic 21px/1.8 Georgia;
+  color: var(--ink);
+}
+.opened-letter footer {
+  font-size: 11px;
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+}
+.book-picker {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+.book-picker label {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+  background: #fffdf8;
+  cursor: pointer;
+}
+.book-picker input {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  accent-color: #426c5a;
+}
+.book-picker img {
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+  border-radius: 7px;
+}
+.book-picker span {
+  display: block;
+  margin-top: 10px;
+  font-size: 12px;
+}
+.featured-album {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  background: #dbe7d8;
+  border-radius: 18px;
+  overflow: hidden;
+  margin-bottom: 30px;
+  align-items: center;
+}
+.featured-album > div {
+  padding: 35px;
+}
+.featured-album h2 {
+  font-size: 37px;
+}
+.featured-album img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+}
+.family-tools {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 15px;
+  margin: 20px 0 45px;
+  font-size: 11px;
+}
+.family-tools a {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px;
+  background: #fffdf8;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.family-tools a > span {
+  font-size: 25px;
+}
+.drawing-tools {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.drawing-tools label {
+  font-size: 11px;
+  max-width: 160px;
+}
+.drawing-tools input[type="color"] {
+  padding: 3px;
+  width: 55px;
+  height: 35px;
+}
+.drawing-tools input[type="range"] {
+  width: 130px;
+  padding: 0;
+}
+.drawing-workshop canvas {
+  width: 100%;
+  height: auto;
+  background: #fffdf8;
+  border: 1px solid #c9d6ca;
+  border-radius: 12px;
+  touch-action: none;
+  cursor: crosshair;
+}
+.drawing-workshop {
+  margin-bottom: 30px;
+}
+#story-dice {
+  display: flex;
+  gap: 15px;
+  margin: 28px 0;
+}
+#story-dice span {
+  font: 55px Georgia;
+  background: #f4dfaa;
+  border-radius: 15px;
+  padding: 5px 20px;
+  color: #426c5a;
+}
+.activity-prompts p {
+  font: italic 24px/1.5 Georgia;
+  min-height: 130px;
+}
+.activity-prompts .text-link {
+  display: block;
+  margin-top: 20px;
+}
+.game-console {
+  max-width: 640px;
+  margin: 25px auto;
+  text-align: center;
+}
+.game-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+#new-score {
+  font-size: 16px;
+}
+#new-status {
+  font-size: 14px;
+  min-height: 48px;
+  color: var(--ink);
+}
+#connect-board {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 7px;
+  background: #d4e3e7;
+  padding: 12px;
+  border-radius: 15px;
+  max-width: 480px;
+  margin: 20px auto;
+}
+.connect-cell {
+  aspect-ratio: 1;
+  background: #fffdf8;
+  border: 3px solid #a7bfc5;
+  border-radius: 50%;
+  padding: 0;
+  min-width: 0;
+}
+.connect-cell.player-1 {
+  background: #d77a69;
+  border-color: #b65d4d;
+}
+.connect-cell.player-2 {
+  background: #6aa3bf;
+  border-color: #4c829a;
+}
+.connect-cell:disabled {
+  cursor: default;
+  opacity: 1;
+}
+#star-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  max-width: 380px;
+  margin: 20px auto;
+}
+#star-board button {
+  aspect-ratio: 1;
+  border: 1px solid #bccfc0;
+  border-radius: 15px;
+  background: #e9efdf;
+  color: #b07825;
+  font-size: 49px;
+}
+#star-board button[data-target="true"] {
+  background: #f4dba0;
+}
+#word-tiles {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 25px 0;
+}
+#word-tiles button {
+  width: 55px;
+  height: 60px;
+  background: #f2d594;
+  color: #233e3c;
+  border: 1px solid #cdb779;
+  border-radius: 10px;
+  font-size: 25px;
+  font-weight: 700;
+}
+.extra-game #word-answer {
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 25px;
+}
+.extra-game .action-row {
+  justify-content: center;
+}
+.extra-game .fine-print {
+  margin-top: 25px;
+}
+.extra-game > .page-heading {
+  margin: 25px auto 40px;
+  max-width: 640px;
+  text-align: center;
+}
+html[data-theme="dark"] {
+  --cream: #172623;
+  --ink: #e7eee5;
+  --muted: #b8c8ba;
+  --line: #41564b;
+  color-scheme: dark;
+}
+html[data-theme="dark"] .site-header,
+html[data-theme="dark"] .site-footer {
+  background: #172623;
+}
+html[data-theme="dark"] .form-card,
+html[data-theme="dark"] .panel,
+html[data-theme="dark"] .album-info,
+html[data-theme="dark"] .media-caption,
+html[data-theme="dark"] .family-media-card,
+html[data-theme="dark"] .member-card,
+html[data-theme="dark"] .family-tools a,
+html[data-theme="dark"] .book-picker label,
+html[data-theme="dark"] .opened-letter,
+html[data-theme="dark"] .home-notes blockquote {
+  background: #20372f;
+}
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea {
+  background: #172b24;
+  border-color: #627c68;
+  color: #e7eee5;
+}
+html[data-theme="dark"] .button:not(.outline) {
+  background: #c9dfc4;
+  color: #172623;
+  border-color: #c9dfc4;
+}
+html[data-theme="dark"] .button.outline:hover {
+  background: #334d3d;
+}
+html[data-theme="dark"] .login-switch,
+html[data-theme="dark"] .notice,
+html[data-theme="dark"] .command-line {
+  background: #2c4638;
+}
+html[data-theme="dark"] .login-switch a[aria-current] {
+  background: #c9dfc4;
+  color: #172623;
+}
+html[data-theme="dark"] .dev-strip {
+  background: #0d1915;
+}
+html[data-theme="dark"] .admin-entry {
+  background: #20372f;
+}
+html[data-theme="dark"] .frame-caption {
+  color: #233e3c;
+}
+html[data-theme="dark"] .frame-caption [data-story-caption] {
+  color: #233e3c;
+}
+html[data-theme="dark"] .discovery,
+html[data-theme="dark"] .timeline-card,
+html[data-theme="dark"] .day-memory,
+html[data-theme="dark"] .first-memory,
+html[data-theme="dark"] .firsts-teaser,
+html[data-theme="dark"] .mini-game-grid a,
+html[data-theme="dark"] .world-dock,
+html[data-theme="dark"] .note-card,
+html[data-theme="dark"] .featured-album {
+  color: #233e3c;
+}
+html[data-theme="dark"] .discovery p,
+html[data-theme="dark"] .timeline-card p,
+html[data-theme="dark"] .day-memory p,
+html[data-theme="dark"] .first-memory p,
+html[data-theme="dark"] .firsts-teaser p,
+html[data-theme="dark"] .featured-album p,
+html[data-theme="dark"] .note-card p {
+  color: #425952;
+}
+html[data-theme="dark"] .note-card .eyebrow,
+html[data-theme="dark"] .note-card small,
+html[data-theme="dark"] .mini-game-grid small {
+  color: #425952;
+}
+html[data-theme="dark"] .firsts-teaser .button,
+html[data-theme="dark"] .featured-album .button {
+  color: #233e3c;
+  border-color: #233e3c;
+  background: transparent;
+}
+html[data-theme="dark"] .private-badge,
+html[data-theme="dark"] .pill {
+  background: #354e3c;
+  color: #e7eee5;
+}
+html[data-theme="dark"] .reactions button {
+  background: #20372f;
+}
+html[data-theme="dark"] .favorite-button {
+  background: #594039;
+  color: #ffe2d5;
+}
+html[data-theme="dark"] #main-nav.open {
+  background: #20372f;
+}
+html[data-theme="dark"] .game-console .fine-print {
+  color: #b8c8ba;
+}
+html[data-theme="dark"] .teaser-list small {
+  color: #425952;
+}
+html[data-theme="dark"] .album-art .cover-badge {
+  color: #233e3c;
+}
+html[data-theme="dark"] .home-notes blockquote p {
+  color: #e7eee5;
+}
+html[data-theme="dark"] .note-card textarea,
+html[data-theme="dark"] .note-card input {
+  background: #fffdf8;
+  color: #233e3c;
+}
+@media (max-width: 1100px) {
+  .site-header nav {
+    gap: 10px;
+    font-size: 11px;
+  }
+  .site-header {
+    gap: 15px;
+  }
+  .family-tools {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .book-picker {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 1000px) {
+  .menu-toggle {
+    display: block;
+  }
+  #main-nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 4%;
+    right: 4%;
+    background: var(--cream);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px;
+    gap: 16px;
+    align-items: stretch;
+  }
+  #main-nav.open {
+    display: flex;
+    flex-direction: column;
+  }
+  .site-header {
+    position: relative;
+    z-index: 10;
+  }
+  .theme-toggle {
+    align-self: start;
+  }
+}
+@media (max-width: 760px) {
+  .gallery-dialog {
+    padding: 14px 12px;
+    gap: 10px;
+  }
+  .gallery-top {
+    gap: 12px;
+  }
+  .gallery-title {
+    font-size: 12px;
+  }
+  .gallery-bottom {
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .gallery-bottom button {
+    padding: 8px 13px;
+  }
+  .gallery-detail {
+    font-size: 10px;
+  }
+  .gallery-counter {
+    font-size: 10px;
+  }
+  .book-picker {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .book-picker img {
+    height: 140px;
+  }
+  .opened-letter {
+    padding: 25px;
+  }
+  .opened-letter h1 {
+    font-size: 29px;
+  }
+  .letter-body {
+    font-size: 20px;
+  }
+  .featured-album {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .featured-album img {
+    height: 220px;
+    order: -1;
+  }
+  .featured-album > div {
+    padding: 25px;
+  }
+  .featured-album h2 {
+    font-size: 29px;
+  }
+  .family-tools {
+    gap: 10px;
+  }
+  .family-tools a {
+    display: block;
+    padding: 17px 12px;
+    font-size: 10px;
+  }
+  .family-tools a > span {
+    display: block;
+    margin-bottom: 7px;
+  }
+  .drawing-tools {
+    gap: 10px;
+  }
+  .drawing-tools .button {
+    font-size: 10px;
+    padding: 8px 13px;
+  }
+  #story-dice {
+    gap: 10px;
+  }
+  #story-dice span {
+    font-size: 45px;
+    padding: 4px 17px;
+  }
+  .activity-prompts p {
+    font-size: 22px;
+  }
+  .game-console {
+    padding: 20px 15px;
+  }
+  #connect-board {
+    gap: 4px;
+    padding: 8px;
+  }
+  .connect-cell {
+    border-width: 2px;
+  }
+  #star-board {
+    gap: 9px;
+  }
+  #word-tiles {
+    gap: 7px;
+  }
+  #word-tiles button {
+    width: 45px;
+    height: 53px;
+    font-size: 22px;
+  }
+  .extra-game .page-heading h1 {
+    font-size: 36px;
+  }
+  .extra-game #new-score {
+    font-size: 13px;
+  }
+}
+html[data-theme="dark"] {
+  --bg: #172623;
+  --bg2: #20372f;
+  --bg3: #294337;
+  --text: #e7eee5;
+  --text2: #b8c8ba;
+  --text3: #a4b7a9;
+  --border: #41564b;
+  --accent: #b8d6b4;
+  --accent2: #c9dfc4;
+  --dark: #0d1915;
+}
+html[data-theme="dark"] .game-btn-primary,
+html[data-theme="dark"] .game-btn {
+  color: #172623;
+}
+html[data-theme="dark"] .avatar {
+  color: #233e3c;
+}
+html[data-theme="dark"] .first-memory small,
+html[data-theme="dark"] .featured-album small {
+  color: #425952;
+}
+html[data-theme="dark"] .note-card .button.outline {
+  color: #233e3c;
+  border-color: #233e3c;
+}

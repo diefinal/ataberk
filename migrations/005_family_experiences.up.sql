@@ -1,0 +1,11 @@
+ALTER TABLE users ADD COLUMN theme TEXT NOT NULL DEFAULT 'system' CHECK(theme IN ('system','light','dark'));
+ALTER TABLE users ADD COLUMN avatar_key UUID;
+ALTER TABLE media ADD COLUMN taken_on DATE;
+ALTER TABLE media ADD COLUMN place_text TEXT NOT NULL DEFAULT '' CHECK(length(place_text)<=160);
+ALTER TABLE media ADD COLUMN poster_media_id INTEGER REFERENCES media(id) ON DELETE SET NULL;
+ALTER TABLE families ADD COLUMN featured_album_id INTEGER REFERENCES albums(id) ON DELETE SET NULL;
+CREATE TABLE media_people(media_id INTEGER REFERENCES media(id) ON DELETE CASCADE,user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,PRIMARY KEY(media_id,user_id));
+CREATE TABLE submissions(id SERIAL PRIMARY KEY,album_id INTEGER NOT NULL REFERENCES albums(id),user_id INTEGER NOT NULL REFERENCES users(id),title TEXT NOT NULL,description TEXT NOT NULL DEFAULT '',storage_key UUID UNIQUE NOT NULL,mime TEXT NOT NULL CHECK(mime IN ('image/jpeg','image/png')),status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','approved','rejected')),media_id INTEGER REFERENCES media(id),created_at TIMESTAMPTZ NOT NULL DEFAULT now(),reviewed_at TIMESTAMPTZ,reviewed_by INTEGER REFERENCES users(id));
+CREATE INDEX submissions_album_idx ON submissions(album_id,status);
+CREATE TABLE time_capsules(id SERIAL PRIMARY KEY,album_id INTEGER NOT NULL REFERENCES albums(id),user_id INTEGER NOT NULL REFERENCES users(id),title TEXT NOT NULL CHECK(length(title) BETWEEN 1 AND 200),sealed_body TEXT NOT NULL,opens_on DATE NOT NULL,created_at TIMESTAMPTZ NOT NULL DEFAULT now(),deleted_at TIMESTAMPTZ);
+CREATE INDEX time_capsules_album_idx ON time_capsules(album_id) WHERE deleted_at IS NULL;

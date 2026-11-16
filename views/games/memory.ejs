@@ -28,11 +28,12 @@
 </style>
 <script>
 const EMOJIS=['🐧','🦊','🐸','🦁','🐙','🦋','🐳','🦄'];
-let cards=[], flipped=[], moves=0, matches=0, lock=false;
+let cards=[], flipped=[], moves=0, matches=0, lock=false,flipTimer,winTimer;
 
 function shuffle(arr){return arr.sort(()=>Math.random()-.5);}
 
 function init(){
+  clearTimeout(flipTimer);clearTimeout(winTimer);
   moves=0; matches=0; flipped=[]; lock=false;
   document.getElementById('moves').textContent=0;
   document.getElementById('matches').textContent=0;
@@ -59,7 +60,7 @@ function flip(card, el){
     moves++;
     document.getElementById('moves').textContent=moves;
     lock=true;
-    setTimeout(()=>{
+    flipTimer=setTimeout(()=>{
       const [a,b]=flipped;
       if(a.card.emoji===b.card.emoji){
         a.card.matched=b.card.matched=true;
@@ -67,7 +68,7 @@ function flip(card, el){
         matches++;
         document.getElementById('matches').textContent=matches;
         if(matches===8){
-          setTimeout(()=>alert(`Tebrikler! 🎉 ${moves} hamlede tamamladın!`),300);
+          winTimer=setTimeout(()=>alert(`Tebrikler! 🎉 ${moves} hamlede tamamladın!`),300);
         }
       } else {
         a.el.classList.remove('flipped'); b.el.classList.remove('flipped');

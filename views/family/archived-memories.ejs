@@ -1,0 +1,1 @@
+<% if(archivedMemories.length){ %><section class="panel"><h2>Kaldırılan anılar</h2><% archivedMemories.forEach(m=>{ %><div class="action-row"><span><%= m.title %></span><form method="post" action="/admin/ani-geri-al/<%= m.id %>"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="button small outline">Geri al</button></form></div><% }) %></section><% } %>

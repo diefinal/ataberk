@@ -23,7 +23,7 @@
 .ttt-cell.win{background:rgba(200,16,46,0.15);border-color:var(--accent);}
 </style>
 <script>
-let board=Array(9).fill(''), current='X', sX=0, sO=0;
+let board=Array(9).fill(''), current='X', sX=0, sO=0, finished=false;
 const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
 
 function render(){
@@ -44,24 +44,26 @@ function checkWin(){
 }
 
 function play(i){
-  if(board[i]) return;
+  if(board[i]||finished) return;
   board[i]=current;
+  render();
   const w=checkWin();
   if(w){
+    finished=true;
     document.querySelectorAll('.ttt-cell').forEach((c,i)=>{if(w.includes(i))c.classList.add('win');});
     document.getElementById('status').textContent=`${current==='X'?'❌':'⭕'} Kazandı! 🎉`;
     if(current==='X'){sX++;document.getElementById('scoreX').textContent=sX;}
     else{sO++;document.getElementById('scoreO').textContent=sO;}
     return;
   }
-  if(board.every(v=>v)){document.getElementById('status').textContent='Berabere! 🤝';return;}
+  if(board.every(v=>v)){finished=true;document.getElementById('status').textContent='Berabere! 🤝';return;}
   current=current==='X'?'O':'X';
   document.getElementById('status').textContent=`Sıra: ${current==='X'?'❌':'⭕'}`;
   render();
 }
 
 document.getElementById('reset').addEventListener('click',()=>{
-  board=Array(9).fill(''); current='X';
+  board=Array(9).fill(''); current='X';finished=false;
   document.getElementById('status').textContent='Sıra: ❌';
   render();
 });
