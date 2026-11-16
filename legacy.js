@@ -2,7 +2,6 @@
 const express = require("express");
 const LEGACY_ORIGIN = "https://ataberktasci.onrender.com";
 const prefixes = [
-  "/haberler",
   "/youtube",
   "/taksi",
   "/api",

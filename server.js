@@ -91,9 +91,12 @@ app.use(require("./experiences").router);
 app.use(require("./enhancements").router);
 app.use(require("./family"));
 app.use("/oyunlar", require("./routes/games"));
-app.get("/haberler", (req, res) =>
-  res.render("family/external", { title: "Haberler", kind: "news" }),
-);
+if (config.production)
+  app.use("/haberler", require("./routes/news").createNewsRouter());
+else
+  app.get("/haberler", (req, res) =>
+    res.render("family/external", { title: "Haberler", kind: "news" }),
+  );
 app.get(["/youtube", "/youtube/video/:id"], (req, res) =>
   res.render("family/external", { title: "YouTube", kind: "youtube" }),
 );

@@ -1,46 +1,20 @@
-<%- include('partials/header', { title: 'Haberler' }) %>
-
-<section class="section">
-  <div class="container">
-    <div class="section-header">
-      <h1 class="section-title">📰 <span>Haberler</span></h1>
-      <span class="section-link" style="color:var(--text3);font-size:0.78rem;">Her 10 dakikada güncellenir</span>
-    </div>
-
-    <!-- Kaynak sekmeleri -->
-    <div class="news-tabs">
-      <% feeds.forEach(feed => { %>
-      <a href="/haberler?kaynak=<%= feed.name %>"
-         class="news-tab <%= activeFeed.name === feed.name ? 'active' : '' %>"
-         style="--tab-color:<%= feed.color %>">
-        <%= feed.icon %> <%= feed.name %>
-      </a>
-      <% }) %>
-    </div>
-
-    <!-- Haberler -->
-    <% if (activeFeed.items.length === 0) { %>
-    <p class="empty">Haberler yüklenemedi. Lütfen daha sonra tekrar deneyin.</p>
-    <% } else { %>
-    <div class="news-grid">
-      <% activeFeed.items.forEach((item, i) => { %>
-      <a href="<%= item.link %>" target="_blank" rel="noopener" class="news-card <%= i === 0 ? 'featured' : '' %>">
-        <% if (item.image) { %>
-        <div class="news-img">
-          <img src="<%= item.image %>" alt="<%= item.title %>" loading="lazy" onerror="this.parentElement.style.display='none'">
-        </div>
-        <% } %>
-        <div class="news-content">
-          <span class="news-source" style="color:<%= activeFeed.color %>"><%= activeFeed.icon %> <%= activeFeed.name %></span>
-          <h3><%= item.title %></h3>
-          <% if (item.summary) { %><p class="news-summary"><%= item.summary %>...</p><% } %>
-          <span class="news-date">🕐 <%= item.date.toLocaleDateString('tr-TR', {day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}) %></span>
-        </div>
-      </a>
-      <% }) %>
-    </div>
-    <% } %>
-  </div>
+<%- include('partials/header') %>
+<section class="page family-news">
+  <a class="news-back" href="/">← Ataberk'in Dünyası'na dön</a>
+  <div class="news-heading"><div><p class="eyebrow">DÜNYADAN KÜÇÜK BİR MOLA</p><h1>Gündeme bir göz at.</h1><p>Gündem ve spor, aile dünyamızın hemen yanında.</p></div><span class="news-heading-icon" aria-hidden="true">✦</span></div>
+  <nav class="family-news-tabs" aria-label="Haber kaynakları">
+    <% feeds.forEach(feed => { %><a href="/haberler?kaynak=<%= encodeURIComponent(feed.name) %>" <% if(activeFeed.name===feed.name){ %>aria-current="page"<% } %>><span aria-hidden="true"><%= feed.icon %></span> <%= feed.name %></a><% }) %>
+  </nav>
+  <div class="news-status"><strong><%= activeFeed.name %></strong><span><% if(updatedAt){ %>Son güncelleme: <%= updatedAt.toLocaleString('tr-TR', {timeZone:'Europe/Istanbul',day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}) %><% }else{ %>Kaynak bilgisi<% } %></span></div>
+  <% if(stale){ %><p class="news-alert" role="status"><%= items.length ? 'Kaynak şu anda güncellenemiyor. Son alınan haberleri gösteriyoruz.' : 'Bu haber kaynağına şu anda ulaşılamıyor. Başka bir kaynak seçebilir veya biraz sonra yeniden deneyebilirsin.' %></p><% } %>
+  <% if(items.length){ %><div class="family-news-grid">
+    <% items.forEach((item,i) => { %><article class="family-news-card">
+      <div class="news-card-top"><span><%= activeFeed.label %></span><span aria-hidden="true"><%= String(i+1).padStart(2,'0') %></span></div>
+      <h2><a href="<%= item.link %>" target="_blank" rel="noopener noreferrer"><%= item.title %><span class="sr-only"> — kaynak sitede yeni sekmede açılır</span></a></h2>
+      <% if(item.summary){ %><p><%= item.summary %></p><% } %>
+      <div class="news-card-bottom"><% if(item.date){ %><time datetime="<%= item.date.toISOString() %>"><%= item.date.toLocaleDateString('tr-TR',{timeZone:'Europe/Istanbul',day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}) %></time><% }else{ %><span>Tarih belirtilmedi</span><% } %><span aria-hidden="true">↗</span></div>
+    </article><% }) %>
+  </div><% }else if(!stale){ %><p class="news-alert">Bu kaynakta henüz gösterilecek haber bulunamadı.</p><% } %>
+  <p class="news-source-note">Başlıklar kaynakların RSS akışlarından alınır; 10 dakika boyunca önbellekte tutulur. Haberin tamamı kaynak sitede yeni sekmede açılır.</p>
 </section>
-
 <%- include('partials/footer') %>
