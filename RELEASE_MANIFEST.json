@@ -21,8 +21,8 @@
   },
   {
     "path": "server.js",
-    "bytes": 5543,
-    "sha256": "7587bb2c12a8a9eb3c1751617bd779ebf6ab80a58869b272f6fe5a2fe05ae60c"
+    "bytes": 5747,
+    "sha256": "0d7576a9526938f670ff8a7dfec4a19ac4b89422c58f90b6f4d71e93d622cb16"
   },
   {
     "path": "db.js",
@@ -76,8 +76,8 @@
   },
   {
     "path": "legacy.js",
-    "bytes": 1262,
-    "sha256": "835e3fef313dbd42c35feca53b879d7f54efd7c2cf7f97d374de560e14a4bc19"
+    "bytes": 1276,
+    "sha256": "ce2bf9a03f11e56aef9ac4e25410eb558026d582c46a83b740569752e73bd6dd"
   },
   {
     "path": "scripts/migrate.js",
@@ -106,8 +106,8 @@
   },
   {
     "path": "config/production.js",
-    "bytes": 2897,
-    "sha256": "2adea9458a4213a46aa26077e4610a4a5f42bd49593dc89ef1048b41d1c47962"
+    "bytes": 2989,
+    "sha256": "73b104886c13a5808fa63c739672558a28af11b4f6b78fbd154899193ed7aab6"
   },
   {
     "path": "config/runtime.js",

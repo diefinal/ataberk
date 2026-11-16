@@ -9,6 +9,7 @@ const prefixes = [
   "/medya",
   "/kategori",
   "/arama",
+  "/uploads",
 ];
 function destination(original) {
   if (

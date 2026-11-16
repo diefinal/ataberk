@@ -28,6 +28,12 @@ app.use((req, res, next) => {
         req.get("host") !== `127.0.0.1:${config.port}`
   )
     return res.status(403).send("Yalnız DEV localhost erişimi.");
+  if (
+    config.production &&
+    req.get("host") === "www.ataberktasci.com.tr" &&
+    config.origin === "https://ataberktasci.com.tr"
+  )
+    return res.redirect(308, config.origin + req.originalUrl);
   res.set({
     "Content-Security-Policy":
       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'",

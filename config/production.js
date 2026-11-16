@@ -42,6 +42,8 @@ function validate(e) {
   if (!Number.isInteger(port) || port < 1024 || port > 65535)
     throw Error("Invalid production PORT");
   const hosts = [origin.host];
+  if (origin.hostname === "ataberktasci.com.tr")
+    hosts.push("www.ataberktasci.com.tr");
   if (e.RENDER_EXTERNAL_HOSTNAME) {
     if (!/^[a-z0-9-]+\.onrender\.com$/.test(e.RENDER_EXTERNAL_HOSTNAME))
       throw Error("Invalid Render hostname");
