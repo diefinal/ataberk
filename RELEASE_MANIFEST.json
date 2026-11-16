@@ -21,8 +21,8 @@
   },
   {
     "path": "server.js",
-    "bytes": 4948,
-    "sha256": "06d340b52b2b5ecf4d3239f946efc548dc708cda687bb7b1e0eb4cd379f4f75f"
+    "bytes": 5178,
+    "sha256": "34ae960ed560569542514a4e3cf28359f6413dcb701c6dbfbd924f1ad822daae"
   },
   {
     "path": "db.js",

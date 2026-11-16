@@ -6,11 +6,20 @@ const express = require("express"),
   { pool } = require("./db");
 const { PgStore, csrf, wrap, loadUser } = require("./security");
 const app = express();
+app.set("env", config.production ? "production" : "development");
 app.disable("x-powered-by");
 if (config.production) app.set("trust proxy", 1);
 app.get("/healthz", (req, res) => res.json({ status: "ok" }));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+app.use((req, res, next) => {
+  Object.assign(res.locals, {
+    production: !!config.production,
+    user: null,
+    csrf: "",
+  });
+  next();
+});
 app.use((req, res, next) => {
   if (
     config.production
@@ -82,14 +91,9 @@ app.use((req, res) =>
 );
 app.use((err, req, res, next) => {
   if (res.headersSent) return next(err);
-  const validation = [
-    "22P02",
-    "22007",
-    "22008",
-    "23503",
-    "23505",
-    "23514",
-  ].includes(err.code);
+  const validation =
+    err.type === "entity.parse.failed" ||
+    ["22P02", "22007", "22008", "23503", "23505", "23514"].includes(err.code);
   res
     .status(validation ? 400 : err.code === "LIMIT_FILE_SIZE" ? 413 : 500)
     .render("family/notice", {
